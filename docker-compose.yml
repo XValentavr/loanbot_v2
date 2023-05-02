@@ -1,0 +1,37 @@
+version: "3.5"
+
+services:
+  mysql:
+    image: mysql:latest
+    restart: always
+    env_file:
+      - ".env.docker"
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql:/var/lib/postgresql/
+    networks:
+      - api-network
+
+  bot:
+    build: .
+    command: bash -c "alembic upgrade head && python src/bot.py"
+    #    command: bash -c "alembic -x database_url=mysql+pymysql://loan:loan_bot@mysql:3306/loan revision --autogenerate -m 'create admin page'"
+
+    restart: always
+    volumes:
+      - .:/app
+    env_file:
+      - ".env"
+    depends_on:
+      - mysql
+    networks:
+      - api-network
+
+
+volumes:
+  mysql:
+
+networks:
+  api-network:
+    driver: bridge
