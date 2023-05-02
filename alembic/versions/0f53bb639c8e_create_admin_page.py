@@ -1,8 +1,8 @@
 """create admin page
 
-Revision ID: 51c49c27eb76
+Revision ID: 0f53bb639c8e
 Revises: 
-Create Date: 2023-05-02 16:23:56.877545
+Create Date: 2023-05-02 17:06:41.183843
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '51c49c27eb76'
+revision = '0f53bb639c8e'
 down_revision = None
 branch_labels = None
 depends_on = None
