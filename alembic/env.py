@@ -14,7 +14,10 @@ root_dir = join(d(d(abspath(__file__))), "src")
 sys.path.append(root_dir)
 
 from helpers.creds import Creds
-from models.admins import LoanAdmins
+from models.admins import LoanAdminsModel
+from models.sources_of_income_model import SourcesOfIncomeModel
+from models.earning_model import EarningsModel
+
 from models.base_model import Base
 
 # this is the Alembic Config object, which provides

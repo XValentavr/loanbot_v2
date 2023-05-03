@@ -1,6 +1,4 @@
-from aiogram.utils import executor
-
 from bot import loan
 
 if __name__ == '__main__':
-    executor.start_polling(loan)
+    loan.polling(none_stop=True, interval=0, allowed_updates=None)

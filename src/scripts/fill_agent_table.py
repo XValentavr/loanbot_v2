@@ -7,7 +7,7 @@ def fill_agent_table():
                      'demkov': '11111'}
     for key in user_password.keys():
         password = encryptor.generate_encrypted_password(characters=user_password.get(key))
-        agent_cruds.insert_agent_cruds(username=key, password=password, is_logged_in=False)
+        agent_cruds.insert_agent(username=key, password=password, is_logged_in=False)
 
 
 if __name__ == '__main__':

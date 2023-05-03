@@ -1,12 +1,14 @@
-from aiogram import types
-
 from cruds.agent_cruds import agent_cruds
 from helpers.encrypt_and_decrypt import encryptor
 
 
-async def echo_handler(message: types.Message):
-    from bot import loan
-
+def start_handler(message, loan):
+    """
+    Check user and his password
+    :param message: current message of chat
+    :param loan: current bot instance
+    :return: None
+    """
     password = message.text
     agent_username = message.from_user.username
 
@@ -15,10 +17,8 @@ async def echo_handler(message: types.Message):
         if encryptor.compare_password(agent.admin_password, password) and agent.admin_username == agent_username:
             agent_cruds.update_agent_is_logged_in(agent)
 
-            await message.answer(f"Вы успешно вошли в аккаунт")
-            loan.message_handlers.unregister(echo_handler)
-            break
+            loan.send_message(message.chat.id, f"Вы успешно вошли в аккаунт")
+            return True
 
-        await message.answer(f"Пароль неверен. Повторите попытку")
-        break
-
+        loan.send_message(message.chat.id, f"Пароль неверен. Повторите попытку /start")
+        return False

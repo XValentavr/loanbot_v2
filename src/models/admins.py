@@ -3,7 +3,7 @@ from sqlalchemy import Column, String, Boolean
 from models.base_model import BaseModel
 
 
-class LoanAdmins(BaseModel):
+class LoanAdminsModel(BaseModel):
     __tablename__ = "loan_admins"
 
     admin_username = Column(String(100), nullable=False)
