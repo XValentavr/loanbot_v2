@@ -10,11 +10,13 @@ class EarningsCruds:
     def insert_source(summa: str, comment: str,
                       agent_id: Optional[str],
                       source_id: Optional[str],
+                      currency: str,
                       is_other_source: str):
         source = EarningsModel(summa=summa,
                                comment=comment,
                                agent_source_id=agent_id,
                                income_source_id=source_id,
+                               currency=currency,
                                is_other_source=is_other_source)
 
         source.id = uuid.uuid4()

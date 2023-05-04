@@ -4,6 +4,12 @@ from helpers.enums.inline_buttons_helper_enum import InlineButtonsHelperEnum
 
 
 def buttons_ready_or_not(message, loan):
+    """
+    Create button to check if transaction is ready
+    :param message:  message of chat
+    :param loan: current bot instance
+    :return: None
+    """
     markup = InlineKeyboardMarkup()
     markup.row(
         InlineKeyboardButton('Подтвердить', callback_data=InlineButtonsHelperEnum.READY),

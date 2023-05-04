@@ -33,4 +33,4 @@ def earnings_with_other_source_insert_data_handler(message, loan):
     :return:
     """
     loan.send_message(message.chat.id, "Введите источник дохода")
-    loan.register_next_step_handler(message, lambda msg: base_data_handler(msg, loan))
+    loan.register_next_step_handler(message, lambda msg: base_data_handler(msg, loan, True))

@@ -9,7 +9,7 @@ from cruds.agent_cruds import agent_cruds
 from helpers import creds
 
 from helpers.event_handler_helper import event_main_buttons_helper
-from helpers.is_logged_in_decorator import login_required
+from helpers.decorators.is_logged_in_decorator import login_required
 from steps.check_password import check_password_and_set_privacy
 
 loan = telebot.TeleBot(creds.Creds.LOAN_BOT_ID)

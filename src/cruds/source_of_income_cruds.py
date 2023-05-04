@@ -7,11 +7,11 @@ from models.sources_of_income_model import SourcesOfIncomeModel
 class SourceOfIncomeCruds:
     @staticmethod
     def insert_source(source: str):
-        source = SourcesOfIncomeModel(source=source)
+        source_income = SourcesOfIncomeModel(source=source)
 
-        source.id = uuid.uuid4()
+        source_income.id = uuid.uuid4()
 
-        session.add(source)
+        session.add(source_income)
         session.commit()
 
     @staticmethod

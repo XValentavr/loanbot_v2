@@ -17,8 +17,8 @@ def start_handler(message, loan):
         if encryptor.compare_password(agent.admin_password, password) and agent.admin_username == agent_username:
             agent_cruds.update_agent_is_logged_in(agent)
 
-            loan.send_message(message.chat.id, f"Вы успешно вошли в аккаунт")
+            loan.send_message(message.chat.id, "Вы успешно вошли в аккаунт")
             return True
 
-        loan.send_message(message.chat.id, f"Пароль неверен. Повторите попытку /start")
+        loan.send_message(message.chat.id, "Пароль неверен. Повторите попытку /start")
         return False

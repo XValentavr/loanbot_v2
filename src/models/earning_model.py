@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean, ForeignKey, func, DateTime
+from sqlalchemy import Column, String, ForeignKey, func, DateTime
 from sqlalchemy.orm import relationship
 
 from models.admins import LoanAdminsModel
@@ -10,6 +10,7 @@ class EarningsModel(BaseModel):
     __tablename__ = "earnings_model"
 
     summa = Column(String(155), nullable=False)
+    currency = Column(String(25), nullable=True)
     comment = Column(String(255), nullable=True)
     agent_id = relationship(LoanAdminsModel, backref="earnings_model")
 
