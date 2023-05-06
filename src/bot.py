@@ -10,7 +10,7 @@ from helpers import creds
 
 from helpers.event_handler_helper import event_main_buttons_helper
 from helpers.decorators.is_logged_in_decorator import login_required
-from helpers.income_and_profit.profit_last_two_weeks_calculator import get_profit_of_last_two_weeks
+
 from steps.check_password import check_password_and_set_privacy
 
 loan = telebot.TeleBot(creds.Creds.LOAN_BOT_ID)
