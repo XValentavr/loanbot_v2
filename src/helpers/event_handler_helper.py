@@ -10,6 +10,7 @@ from commands_handler.show_balance_handler import get_agent_balance
 from cruds.source_of_income_cruds import source_of_income_cruds
 from helpers.enums.inline_buttons_enum import InlineButtonsEnum
 from helpers.enums.inline_buttons_helper_enum import InlineButtonsHelperEnum
+from helpers.income_and_profit.profit_other_date_calculator import get_profit_of_other_dates
 
 agent_set_income_source: Dict = {}
 has_expense: Dict = {}
@@ -20,7 +21,7 @@ def event_main_buttons_helper(call, agent, loan):
         get_agent_balance(message=call.message, loan=loan, agent=agent)
 
     elif call.data == InlineButtonsEnum.INCOME:
-        buttons_get_previous_incomes(message=call.message, loan=loan)
+        buttons_get_previous_incomes(message=call.message, loan=loan, agent=agent)
 
     elif call.data == InlineButtonsEnum.INSERT:
         buttons_insert_data(call.message, loan)
@@ -28,7 +29,6 @@ def event_main_buttons_helper(call, agent, loan):
     elif call.data == InlineButtonsEnum.EXPENSE:
 
         has_expense[agent.admin_username] = True
-        loan.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
 
         expense_data_handler(message=call.message, loan=loan)
 
@@ -36,7 +36,6 @@ def event_main_buttons_helper(call, agent, loan):
 
         if has_expense:
             del has_expense[agent.admin_username]
-        loan.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
 
         earnings_data_handler(message=call.message, loan=loan)
 
@@ -62,6 +61,10 @@ def event_other_buttons_helper(call, agent, loan):
 
     elif call.data == InlineButtonsHelperEnum.CHANGE:
         change_event(message=call.message, loan=loan)
+
+    elif call.data == InlineButtonsEnum.PREV_INCOMES:
+
+        loan.send_message(chat_id=call.message.chat.id, text=get_profit_of_other_dates(agent), parse_mode='MarkdownV2')
 
     elif call.data in income_sources and call.data != InlineButtonsHelperEnum.OTHER:
         source = source_of_income_cruds.get_source_by_source_name(call.data)
