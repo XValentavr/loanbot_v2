@@ -3,6 +3,7 @@ from typing import Dict
 from buttons.button_ready_or_not import buttons_ready_or_not
 from buttons.buttons_if_logged_in import buttons_if_logged_in
 from cruds.earning_cruds import earnings_cruds
+from cruds.source_of_income_cruds import source_of_income_cruds
 from helpers.enums.error_enum import ErrorEnum
 from helpers.income_and_profit.extract_summa_and_currency import extract_necessary_data
 
@@ -52,7 +53,8 @@ def ready_event(message, agent, loan, source, expense):
         earnings_cruds.insert_source(summa=check_type_of_transaction_and_revert_amount(expense, amount),
                                      comment=text,
                                      source_id=source.id if not other_source.get(
-                                         agent.admin_username) and not expense else None,
+                                         agent.admin_username) and not expense else source_of_income_cruds.get_source_by_source_name(
+                                         'Другое').id,
                                      agent_id=agent.id,
                                      currency=currency,
                                      is_other_source=other_source.get(agent.admin_username) if other_source.get(

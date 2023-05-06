@@ -33,9 +33,10 @@ def generate_profit_table(profits: List[EarningsModel]):
             earned.append(get_all_summa_of_profit(profit, uah, eur))
 
         if eur and uah:
+            earnings = f'***ОБЩАЯ СУММА {sum(earned)}***'
             return '```{}```'.format(
                 table) + f'\nТекущие курсы: {str(uah).replace(".", ",")} грн/долл и {str(eur).replace(".", ",")} долл/евро\n\n' + \
-                   ''.join(earned)
+                   str(earnings).replace('.', ',')
 
         return "Произошла ошибка, попробуйте ещё раз"
 
@@ -46,15 +47,25 @@ def get_all_summa_of_profit(profit, uah, eur):
     earned = 0
 
     if profit.currency == CurrencyEnum.DOLLAR:
-        earned += round(int(profit.summa) / int(profit.source_id.percent))
+        if str(profit.source_id.percent).strip():
+            earned += round(int(profit.summa) / int(profit.source_id.percent))
+        else:
+            earned += round(int(profit.summa))
 
     elif profit.currency == CurrencyEnum.UAH:
-        earned += round(int(profit.summa) / int(profit.source_id.percent)) / uah
+        if str(profit.source_id.percent).strip():
+            earned += round(int(profit.summa) / int(profit.source_id.percent)) / uah
+        else:
+            earned += round(int(profit.summa))
 
     elif profit.currency == CurrencyEnum.EURO:
-        earned += round(int(profit.summa) / int(profit.source_id.percent)) / eur
+        if str(profit.source_id.percent).strip():
 
-    return f'***ОБЩАЯ СУММА {str(round(earned,1)).replace(".", ",")}***'
+            earned += round(int(profit.summa) / int(profit.source_id.percent)) / eur
+        else:
+            earned += round(int(profit.summa))
+
+    return float(round(earned, 1))
 
 
 def date_changer(date):

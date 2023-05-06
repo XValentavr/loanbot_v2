@@ -16,4 +16,4 @@ def buttons_get_previous_incomes(message, loan, agent):
     prev_incomes = types.InlineKeyboardButton(text='Ранее', callback_data='prev_incomes')
     keyboard.row(prev_incomes)
 
-    loan.send_message(message.chat.id, 'Просмотрите ранее', reply_markup=keyboard)
+    loan.send_message(message.chat.id, 'Просмотрите более ранние транзакции', reply_markup=keyboard)
