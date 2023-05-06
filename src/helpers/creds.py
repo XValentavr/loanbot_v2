@@ -12,6 +12,8 @@ class Creds(str, enum.Enum):
 
     LOAN_BOT_ID: str = envs.get("LOAN_BOT_ID")
     MYSQL_HOST: str = envs.get("MYSQL_HOST")
+    CURRENCY_API_ID: str = envs.get('CURRENCY_API_ID')
+    CURRENCY_URL: str = envs.get('CURRENCY_URL')
 
     def __str__(self) -> str:
         return "%s" % self.value

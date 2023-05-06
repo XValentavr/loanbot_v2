@@ -12,6 +12,5 @@ def get_agent_balance(message, loan, agent: LoanAdminsModel):
     :return:
     """
     earnings = earnings_cruds.get_earning_by_agent_id(agent.id)
-    loan.edit_message_reply_markup(message.chat.id, message.message_id, reply_markup=None)
 
     loan.send_message(chat_id=message.chat.id, text=create_balance_message(earnings), parse_mode='MarkdownV2')

@@ -14,10 +14,12 @@ def create_balance_message(earnings):
     table = PrettyTable(['Валюта', 'Баланс'])
 
     balances = create_balance(earnings)
-    for currency, balance in balances.items():
-        table.add_row([currency, balance])
+    if balances:
+        for currency, balance in balances.items():
+            table.add_row([currency, balance])
 
-    return '```{}```'.format(table)
+        return '```{}```'.format(table)
+    return 'Баланса пока нет'
 
 
 def dollar_calculator(earnings: List[EarningsModel]):

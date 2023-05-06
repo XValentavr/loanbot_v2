@@ -4,7 +4,7 @@ from buttons.button_ready_or_not import buttons_ready_or_not
 from buttons.buttons_if_logged_in import buttons_if_logged_in
 from cruds.earning_cruds import earnings_cruds
 from helpers.enums.error_enum import ErrorEnum
-from helpers.extract_summa_and_currency import extract_necessary_data
+from helpers.income_and_profit.extract_summa_and_currency import extract_necessary_data
 
 other_source: Dict = {}
 
@@ -57,7 +57,6 @@ def ready_event(message, agent, loan, source, expense):
                                      currency=currency,
                                      is_other_source=other_source.get(agent.admin_username) if other_source.get(
                                          agent.admin_username) and not expense else None)
-        loan.edit_message_reply_markup(message.chat.id, message.message_id, reply_markup=None)
 
         loan.send_message(message.chat.id, "Транзакция успешная!")
 
