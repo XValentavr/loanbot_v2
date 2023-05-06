@@ -55,7 +55,8 @@ class SourceOfIncomeCruds:
 
     @staticmethod
     def get_source_percent_and_summa_by_username_other_date(username: str, date_to_check) -> Union[EarningsModel]:
-        return (session.query(
+
+        data = (session.query(
             extract('month', EarningsModel.time_created).label('month'),
             extract('year', EarningsModel.time_created).label('year'),
             EarningsModel.currency,
@@ -66,6 +67,8 @@ class SourceOfIncomeCruds:
                 .filter(EarningsModel.time_created < date_to_check)
                 .group_by('year', 'month', EarningsModel.currency)
                 .all())
+
+        return data
 
 
 source_of_income_cruds = SourceOfIncomeCruds()
