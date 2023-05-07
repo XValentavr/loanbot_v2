@@ -18,7 +18,7 @@ def create_balance_message(earnings):
         for currency, balance in balances.items():
             table.add_row([currency, balance])
 
-        return '```{}```'.format(table)
+        return '```{}```'.format(table) + '\n' + create_balance_history(earnings)
     return 'Баланса пока нет'
 
 
@@ -56,3 +56,24 @@ def create_balance(earnings) -> Dict:
         balance['UAH'] = uah
 
     return balance
+
+
+def create_balance_history(profits: List[EarningsModel]):
+    history = []
+    for number, profit in enumerate(profits):
+        if number < 10:
+            history.append(history_template(profit, number))
+
+    return '\n'.join(history)
+
+
+def history_template(profit: EarningsModel, number):
+    from helpers.income_and_profit.profit_last_two_weeks_calculator import date_changer
+    return f"{number + 1}\\.{date_changer(str(profit.time_created))}: {escaper(profit.summa)} {profit.currency}\\. Клиент \\- {profit.source_id.source}"
+
+
+def escaper(string):
+    if '-' in string:
+        string = str(string).replace('-', '\\-')
+        return f"выведено {string}"
+    return f"внесено {string}"

@@ -1,5 +1,7 @@
 from typing import Dict
 
+from buttons.buttons_back import buttons_back
+from buttons.buttons_if_logged_in import buttons_if_logged_in
 from commands_handler.base_data_expense_or_earnings_handler import ready_event, change_event
 from buttons.buttons_insert_data import buttons_insert_data
 from buttons.buttons_my_prev_incomes import buttons_get_previous_incomes
@@ -19,6 +21,9 @@ has_expense: Dict = {}
 def event_main_buttons_helper(call, agent, loan):
     if call.data == InlineButtonsEnum.BALANCE:
         get_agent_balance(message=call.message, loan=loan, agent=agent)
+
+    elif call.data == InlineButtonsEnum.BACK:
+        buttons_if_logged_in(call.message, loan)
 
     elif call.data == InlineButtonsEnum.INCOME:
         buttons_get_previous_incomes(message=call.message, loan=loan, agent=agent)
@@ -64,7 +69,7 @@ def event_other_buttons_helper(call, agent, loan):
 
     elif call.data == InlineButtonsEnum.PREV_INCOMES:
 
-        loan.send_message(chat_id=call.message.chat.id, text=get_profit_of_other_dates(agent), parse_mode='MarkdownV2')
+        loan.send_message(chat_id=call.message.chat.id, text=get_profit_of_other_dates(agent), parse_mode='MarkdownV2', reply_markup=buttons_back())
 
     elif call.data in income_sources and call.data != InlineButtonsHelperEnum.OTHER:
         source = source_of_income_cruds.get_source_by_source_name(call.data)

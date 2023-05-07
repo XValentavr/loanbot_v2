@@ -1,11 +1,10 @@
 from datetime import datetime, timedelta
 from typing import List
 
-from prettytable import PrettyTable
-
 from cruds.source_of_income_cruds import source_of_income_cruds
 from helpers.apis.get_currency_api import get_actual_currency
 from helpers.enums.currency_enum import CurrencyEnum
+from helpers.enums.inline_buttons_helper_enum import InlineButtonsHelperEnum
 from models.admins import LoanAdminsModel
 from models.earning_model import EarningsModel
 
@@ -19,26 +18,20 @@ def get_profit_of_last_two_weeks(agent: LoanAdminsModel):
 
 
 def generate_profit_table(profits: List[EarningsModel]):
-    table = PrettyTable(['Дата', 'Источник', 'Сумма', '%', 'Доход'])
+    table = []
     earned = []
     if profits:
         uah, eur = get_actual_currency()
 
         for profit in profits:
             # get earned money
-
-            table.add_row([date_changer(str(profit.time_created)), profit.source_id.source,
-                           f'{profit.summa} {profit.currency}', profit.source_id.percent,
-                           str(round(float(profit.summa) / float(profit.source_id.percent),
-                                     1)) + ' ' + profit.currency if str(
-                               profit.source_id.percent).strip() else profit.summa + ' ' + profit.currency])
-
-            earned.append(get_all_summa_of_profit(profit, uah, eur))
+            if profit.source_id.source != InlineButtonsHelperEnum.OTHER:
+                table.append(create_profit_string(profit))
+                earned.append(get_all_summa_of_profit(profit, uah, eur))
 
         if eur and uah:
-            earnings = f'***ОБЩАЯ СУММА {escape_reserved_chars(str(sum(earned)))}***'
-            return '```{}```'.format(
-                table) + f'\nТекущие курсы: {str(uah).replace(".", ",")} грн/долл и {str(eur).replace(".", ",")} долл/евро\n\n' + \
+            earnings = f'***ОБЩАЯ СУММА {escape_reserved_chars(str(sum(earned)))}$***'
+            return '{}'.format('\n'.join(table)) + f'\nТекущие курсы: {str(uah).replace(".", ",")} грн/долл и {str(eur).replace(".", ",")} долл/евро\n\n' + \
                    str(earnings).replace('.', ',')
 
         return "Произошла ошибка, попробуйте ещё раз"
@@ -48,25 +41,16 @@ def generate_profit_table(profits: List[EarningsModel]):
 
 def get_all_summa_of_profit(profit, uah, eur):
     earned = 0
+    if str(profit.source_id.percent).strip():
+        if profit.currency == CurrencyEnum.DOLLAR:
+            earned += round(percent_calculator(percent=profit.source_id.percent, summa=profit.summa))
 
-    if profit.currency == CurrencyEnum.DOLLAR:
-        if str(profit.source_id.percent).strip():
-            earned += round(int(profit.summa) / int(profit.source_id.percent))
-        else:
-            earned += round(int(profit.summa))
+        elif profit.currency == CurrencyEnum.UAH:
+            earned += round(percent_calculator(percent=profit.source_id.percent, summa=profit.summa)) / uah
 
-    elif profit.currency == CurrencyEnum.UAH:
-        if str(profit.source_id.percent).strip():
-            earned += round(int(profit.summa) / int(profit.source_id.percent)) / uah
-        else:
-            earned += round(int(profit.summa) / uah)
+        elif profit.currency == CurrencyEnum.EURO:
 
-    elif profit.currency == CurrencyEnum.EURO:
-        if str(profit.source_id.percent).strip():
-
-            earned += round(int(profit.summa) / int(profit.source_id.percent)) / eur
-        else:
-            earned += round(int(profit.summa) / eur)
+            earned += round(percent_calculator(percent=profit.source_id.percent, summa=profit.summa)) / eur
 
     return float(round(earned, 1))
 
@@ -81,3 +65,16 @@ def escape_reserved_chars(summa):
     if float(summa):
         return str(summa).replace('-', '\\-')
     return summa
+
+
+def percent_calculator(summa, percent):
+    return (int(summa) *int(percent)) / 100
+
+
+def create_profit_string(profit: EarningsModel):
+    return f'***Дата***: {date_changer(str(profit.time_created))}\\. ' \
+           f'***Источник***: {profit.source_id.source}\\. ' \
+           f'***Сумма***: {profit.summa} {profit.currency}\\. ' \
+           f'***Процент***: {profit.source_id.percent}\\. ' \
+           f'***Доход***: {str(round(percent_calculator(percent=profit.source_id.percent, summa=profit.summa)))} {profit.currency}'+ '\n'
+
