@@ -5,6 +5,7 @@ from buttons.buttons_if_logged_in import buttons_if_logged_in
 from buttons.buttons_insert_data import buttons_insert_data
 from buttons.buttons_my_prev_incomes import buttons_get_previous_incomes
 from commands_handler.show_balance_handler import get_agent_balance
+from create_engine import session
 from cruds.agent_cruds import agent_cruds
 from helpers import creds
 
@@ -19,12 +20,13 @@ logging.basicConfig(filename="sample.log", level=logging.ERROR)
 
 @loan.message_handler(commands=["start"])
 def send_welcome(message):
+    session.commit()
     agent = agent_cruds.get_by_username(username=message.from_user.username)
     if not agent.is_login:
         loan.send_message(message.chat.id, "Введите пароль")
         loan.register_next_step_handler(message, lambda msg: check_password_and_set_privacy(msg, loan))
-
-    buttons_if_logged_in(message, loan)
+    else:
+        buttons_if_logged_in(message, loan)
 
 
 @loan.message_handler(commands=["income"])

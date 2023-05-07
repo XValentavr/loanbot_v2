@@ -19,7 +19,7 @@ def get_profit_of_last_two_weeks(agent: LoanAdminsModel):
 
 
 def generate_profit_table(profits: List[EarningsModel]):
-    table = PrettyTable(['Дата', 'Источник', 'Сумма'])
+    table = PrettyTable(['Дата', 'Источник', 'Сумма', '%', 'Доход'])
     earned = []
     if profits:
         uah, eur = get_actual_currency()
@@ -28,12 +28,15 @@ def generate_profit_table(profits: List[EarningsModel]):
             # get earned money
 
             table.add_row([date_changer(str(profit.time_created)), profit.source_id.source,
-                           f'{profit.summa} {profit.currency}'])
+                           f'{profit.summa} {profit.currency}', profit.source_id.percent,
+                           str(round(float(profit.summa) / float(profit.source_id.percent),
+                                     1)) + ' ' + profit.currency if str(
+                               profit.source_id.percent).strip() else profit.summa + ' ' + profit.currency])
 
             earned.append(get_all_summa_of_profit(profit, uah, eur))
 
         if eur and uah:
-            earnings = f'***ОБЩАЯ СУММА {sum(earned)}***'
+            earnings = f'***ОБЩАЯ СУММА {escape_reserved_chars(str(sum(earned)))}***'
             return '```{}```'.format(
                 table) + f'\nТекущие курсы: {str(uah).replace(".", ",")} грн/долл и {str(eur).replace(".", ",")} долл/евро\n\n' + \
                    str(earnings).replace('.', ',')
@@ -56,14 +59,14 @@ def get_all_summa_of_profit(profit, uah, eur):
         if str(profit.source_id.percent).strip():
             earned += round(int(profit.summa) / int(profit.source_id.percent)) / uah
         else:
-            earned += round(int(profit.summa))
+            earned += round(int(profit.summa) / uah)
 
     elif profit.currency == CurrencyEnum.EURO:
         if str(profit.source_id.percent).strip():
 
             earned += round(int(profit.summa) / int(profit.source_id.percent)) / eur
         else:
-            earned += round(int(profit.summa))
+            earned += round(int(profit.summa) / eur)
 
     return float(round(earned, 1))
 
@@ -72,3 +75,9 @@ def date_changer(date):
     dt_object = datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
 
     return dt_object.strftime('%d %b')
+
+
+def escape_reserved_chars(summa):
+    if float(summa):
+        return str(summa).replace('-', '\\-')
+    return summa

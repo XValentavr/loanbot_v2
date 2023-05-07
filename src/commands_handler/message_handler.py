@@ -1,3 +1,4 @@
+from buttons.buttons_if_logged_in import buttons_if_logged_in
 from cruds.agent_cruds import agent_cruds
 from helpers.encrypt_and_decrypt import encryptor
 
@@ -18,6 +19,8 @@ def start_handler(message, loan):
             agent_cruds.update_agent_is_logged_in(agent)
 
             loan.send_message(message.chat.id, "Вы успешно вошли в аккаунт")
+            buttons_if_logged_in(message, loan)
+
             return True
 
         loan.send_message(message.chat.id, "Пароль неверен. Повторите попытку /start")
