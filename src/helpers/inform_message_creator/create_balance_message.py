@@ -14,11 +14,12 @@ def create_balance_message(earnings):
     table = PrettyTable(['Валюта', 'Баланс'])
 
     balances = create_balance(earnings)
-    if balances:
+    history = create_balance_history(earnings)
+    if balances or history:
         for currency, balance in balances.items():
             table.add_row([currency, balance])
 
-        return '```{}```'.format(table) + '\n' + create_balance_history(earnings)
+        return '```{}```'.format(table) + '\n' + history
     return 'Баланса пока нет'
 
 
@@ -46,14 +47,11 @@ def create_balance(earnings) -> Dict:
     eur = eur_calculator(earnings)
     uah = uah_calculator(earnings)
 
-    if dollar != 0:
-        balance['USD'] = dollar
+    balance['USD'] = dollar
 
-    if eur != 0:
-        balance['EUR'] = eur
+    balance['EUR'] = eur
 
-    if uah != 0:
-        balance['UAH'] = uah
+    balance['UAH'] = uah
 
     return balance
 
@@ -69,11 +67,11 @@ def create_balance_history(profits: List[EarningsModel]):
 
 def history_template(profit: EarningsModel, number):
     from helpers.income_and_profit.profit_last_two_weeks_calculator import date_changer
-    return f"{number + 1}\\.{date_changer(str(profit.time_created))}: {escaper(profit.summa)} {profit.currency}\\. Клиент \\- {profit.source_id.source}"
+    return f"{number + 1}\\.{date_changer(str(profit.time_created))}: {escaper(profit)} "
 
 
-def escaper(string):
-    if '-' in string:
-        string = str(string).replace('-', '\\-')
-        return f"выведено {string}"
-    return f"внесено {string}"
+def escaper(profit):
+    if '-' in profit.summa:
+        string = str(profit.summa).replace('-', '\\-')
+        return f"***{string}{profit.currency}*** {profit.comment}"
+    return f"\\+{profit.summa}{profit.currency} от {profit.source_id.source}"

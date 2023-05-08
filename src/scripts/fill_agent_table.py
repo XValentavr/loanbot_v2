@@ -4,7 +4,8 @@ from helpers.encrypt_and_decrypt import encryptor
 
 def fill_agent_table():
     user_password = {'Valentavr': '12345',
-                     'demkov': '11111'}
+                     'demkov': '11111',
+                     'skv_katya': 'KatyaLoan'}
     for key in user_password.keys():
         password = encryptor.generate_encrypted_password(characters=user_password.get(key))
         agent_cruds.insert_agent(username=key, password=password, is_logged_in=False)

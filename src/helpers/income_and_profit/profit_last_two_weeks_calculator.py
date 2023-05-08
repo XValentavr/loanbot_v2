@@ -31,7 +31,8 @@ def generate_profit_table(profits: List[EarningsModel]):
 
         if eur and uah:
             earnings = f'***ОБЩАЯ СУММА {escape_reserved_chars(str(sum(earned)))}$***'
-            return '{}'.format('\n'.join(table)) + f'\nТекущие курсы: {str(uah).replace(".", ",")} грн/долл и {str(eur).replace(".", ",")} долл/евро\n\n' + \
+            return '{}'.format('\n'.join(
+                table)) + f'\nТекущие курсы: {str(uah).replace(".", ",")} грн/долл и {str(eur).replace(".", ",")} долл/евро\n\n' + \
                    str(earnings).replace('.', ',')
 
         return "Произошла ошибка, попробуйте ещё раз"
@@ -68,13 +69,12 @@ def escape_reserved_chars(summa):
 
 
 def percent_calculator(summa, percent):
-    return (int(summa) *int(percent)) / 100
+    return (int(summa) * int(percent)) / 100
 
 
 def create_profit_string(profit: EarningsModel):
-    return f'***Дата***: {date_changer(str(profit.time_created))}\\. ' \
-           f'***Источник***: {profit.source_id.source}\\. ' \
-           f'***Сумма***: {profit.summa} {profit.currency}\\. ' \
-           f'***Процент***: {profit.source_id.percent}\\. ' \
-           f'***Доход***: {str(round(percent_calculator(percent=profit.source_id.percent, summa=profit.summa)))} {profit.currency}'+ '\n'
-
+    return f"{date_changer(str(profit.time_created))}" \
+           f" {profit.source_id.source} " \
+           f"{profit.source_id.percent}% от " \
+           f"{profit.summa} {profit.currency} \\= " \
+           f"{str(round(percent_calculator(percent=profit.source_id.percent, summa=profit.summa)))} {profit.currency}\n"
