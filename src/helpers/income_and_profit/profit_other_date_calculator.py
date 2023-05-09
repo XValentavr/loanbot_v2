@@ -42,10 +42,10 @@ def calculate_month_profit(month, year, currency, summa, uah, eur):
             profit_dict['summa'] = summa
 
         elif currency == CurrencyEnum.UAH:
-            profit_dict['summa'] = round(profit_dict.get('summa') + int(summa) / uah, 1)
+            profit_dict['summa'] = round(profit_dict.get('summa') + int(summa) / uah, 2)
 
         elif currency == CurrencyEnum.EURO:
-            profit_dict['summa'] = round(profit_dict.get('summa') + int(summa) / eur, 1)
+            profit_dict['summa'] = round(profit_dict.get('summa') + int(summa) / eur, 2)
 
         return profit_dict
     return {}

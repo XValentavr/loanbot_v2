@@ -11,8 +11,8 @@ def get_actual_currency():
     response = requests.get(url, params=params)
     if response.status_code == 200:
         data = response.json()
-        uah_rate = round(data['rates']['UAH'], 1)
-        eur_rate = round(data['rates']['EUR'], 1)
+        uah_rate = round(data['rates']['UAH'], 2)
+        eur_rate = round(data['rates']['EUR'], 2)
         return uah_rate, eur_rate
     else:
         return '', ''

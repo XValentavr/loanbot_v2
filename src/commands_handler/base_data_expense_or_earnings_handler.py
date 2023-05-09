@@ -6,6 +6,7 @@ from buttons.buttons_if_logged_in import buttons_if_logged_in
 from cruds.earning_cruds import earnings_cruds
 from cruds.source_of_income_cruds import source_of_income_cruds
 from helpers.enums.error_enum import ErrorEnum
+from helpers.enums.inline_buttons_helper_enum import InlineButtonsHelperEnum
 from helpers.income_and_profit.extract_summa_and_currency import extract_necessary_data
 
 other_source: Dict = {}
@@ -48,16 +49,16 @@ def ready_event(message, agent, loan, source, expense):
     """
     try:
         amount, currency, text = extract_necessary_data(message.text)
-
+        print('1312', text)
         if text == ErrorEnum.CURRENCY_NOT_FOUND:
             loan.send_message(message.chat.id, ErrorEnum.CURRENCY_NOT_FOUND, reply_to_message_id=message.id)
             base_data_handler(message, loan)
         else:
             earnings_cruds.insert_source(summa=check_type_of_transaction_and_revert_amount(expense, amount),
-                                         comment=text,
+                                         comment=text.split('верно?')[0].strip(),
                                          source_id=source.id if not other_source.get(
                                              agent.admin_username) and not expense else source_of_income_cruds.get_source_by_source_name(
-                                             'Другое').id,
+                                             InlineButtonsHelperEnum.OTHER).id,
                                          agent_id=agent.id,
                                          currency=currency,
                                          is_other_source=other_source.get(agent.admin_username) if other_source.get(
@@ -86,5 +87,5 @@ def check_type_of_transaction_and_revert_amount(expense, amount):
     :return: reverted amount
     """
     if expense:
-        return str(int(amount) * -1)
+        return str(float(amount) * -1)
     return amount

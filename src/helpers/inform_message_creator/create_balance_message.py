@@ -24,15 +24,15 @@ def create_balance_message(earnings):
 
 
 def dollar_calculator(earnings: List[EarningsModel]):
-    return sum([int(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.DOLLAR])
+    return str(sum([float(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.DOLLAR])).replace('.', ',')
 
 
 def eur_calculator(earnings: List[EarningsModel]):
-    return sum([int(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.EURO])
+    return str(sum([float(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.EURO])).replace('.', ',')
 
 
 def uah_calculator(earnings: List[EarningsModel]):
-    return sum([int(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.UAH])
+    return str(sum([float(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.UAH])).replace('.', ',')
 
 
 def create_balance(earnings) -> Dict:
@@ -67,11 +67,12 @@ def create_balance_history(profits: List[EarningsModel]):
 
 def history_template(profit: EarningsModel, number):
     from helpers.income_and_profit.profit_last_two_weeks_calculator import date_changer
-    return f"{number + 1}\\.{date_changer(str(profit.time_created))}: {escaper(profit)} "
+    return f"{number + 1}\\. {date_changer(str(profit.time_created))}: {escaper(profit)} "
 
 
 def escaper(profit):
     if '-' in profit.summa:
         string = str(profit.summa).replace('-', '\\-')
+        string = string.replace('.', ',')
         return f"***{string}{profit.currency}*** {profit.comment}"
-    return f"\\+{profit.summa}{profit.currency} от {profit.source_id.source}"
+    return f"\\+{str(profit.summa).replace('.', ',')}{profit.currency} от {profit.source_id.source}"

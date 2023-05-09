@@ -15,21 +15,21 @@ def extract_comment(message):
     :param message: incame string to check
     :return: amount, currency and comment
     """
-    match = re.search(r'(\d+)\s*(\S+)', message)
+    match = re.search(r'(\d+(?:\.\d+)?)\s+(\w+)', message)
 
     if match:
-        amount = match.group(1)
+        amount = amount_checker(match.group(1))
         currency = check_if_dollar(match.group(2))
-        left_text = re.sub(r'(\d+)\s*(\S+)', '', message).strip()
-
+        comment = comment_slasher(extract_agent_comment(message, [amount, match.group(2)]))
         if currency == ErrorEnum.CURRENCY_NOT_FOUND:
             return '', '', ErrorEnum.CURRENCY_NOT_FOUND
 
-        return amount, currency, left_text
+        return amount, currency, comment
 
 
 def check_if_dollar(currency):
-    dollars = ["дол", "$", "$.", "долл", "дол.", "долл.", "долларов.", "доллар", "долларов", "доллар.", 'usdt', 'usd']
+    dollars = ["дол", "$", "$.", "долл", "дол.", "долл.", "долларов.", "доллар", "долар", "доларов", "долларов",
+               "доллар.", 'usdt', 'usd']
 
     pattern = '|'.join([re.escape(d) for d in dollars])
     if bool(re.search(pattern, currency.lower())):
@@ -56,3 +56,19 @@ def check_if_euro(currency):
         return CurrencyEnum.EURO
 
     return ErrorEnum.CURRENCY_NOT_FOUND
+
+
+def extract_agent_comment(string_to_clear, words_to_remove):
+    for word in words_to_remove:
+        string_to_clear = string_to_clear.replace(word, "")
+    return string_to_clear.strip()
+
+
+def amount_checker(amount):
+    if ',' in amount:
+        return amount.replace(',', '.')
+    return amount
+
+
+def comment_slasher(comment):
+    return comment.replace('.', '\\.')
