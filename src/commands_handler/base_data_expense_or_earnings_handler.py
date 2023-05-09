@@ -49,7 +49,7 @@ def ready_event(message, agent, loan, source, expense):
     """
     try:
         amount, currency, text = extract_necessary_data(message.text)
-        print('1312', text)
+
         if text == ErrorEnum.CURRENCY_NOT_FOUND:
             loan.send_message(message.chat.id, ErrorEnum.CURRENCY_NOT_FOUND, reply_to_message_id=message.id)
             base_data_handler(message, loan)
