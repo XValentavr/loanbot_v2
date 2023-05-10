@@ -2,7 +2,6 @@ from buttons.buttons_agents_balances import buttons_all_agents, buttons_agent_hi
 from cruds.agent_cruds import agent_cruds
 from cruds.earning_cruds import earnings_cruds
 from helpers.enums.helper_enum import HelperEnum
-from helpers.enums.inline_buttons_helper_enum import InlineButtonsHelperEnum
 from helpers.income_and_profit.profit_last_two_weeks_calculator import create_profit_string
 from helpers.income_and_profit.profit_other_date_calculator import get_profit_of_other_dates
 from helpers.inform_message_creator.create_balance_message import create_balance_message
@@ -73,8 +72,20 @@ def create_message(balance, all_profits, history):
 
 
 def get_history(agent, start, end):
+    """
+    Get earnings history of transactions
+    :param agent:
+    :param start:
+    :param end:
+    :return:
+    """
     return earnings_cruds.get_earnings_history(agent.id, start=start, end=end)
 
 
 def create_incomes_story(earnings):
+    """
+    Create special string for incomes
+    :param earnings:
+    :return:
+    """
     return [create_profit_string(profit, for_main_admin=True) for profit in earnings]

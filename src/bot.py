@@ -14,7 +14,7 @@ from helpers.enums.helper_enum import HelperEnum
 from helpers.event_handler_helper import event_main_buttons_helper
 from helpers.decorators.is_logged_in_decorator import login_required
 
-from steps.check_password import check_password_and_set_privacy
+from helpers.check_password import check_password_and_set_privacy
 
 loan = telebot.TeleBot(creds.Creds.LOAN_BOT_ID)
 logging.basicConfig(filename="sample.log", level=logging.ERROR)
