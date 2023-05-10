@@ -3,7 +3,7 @@ from cruds.agent_cruds import agent_cruds
 from helpers.encrypt_and_decrypt import encryptor
 
 
-def start_handler(message, loan):
+def start_handler(message, loan, agent):
     """
     Check user and his password
     :param message: current message of chat
@@ -13,15 +13,13 @@ def start_handler(message, loan):
     password = message.text
     agent_username = message.from_user.username
 
-    agents = agent_cruds.get_all_agents()
-    for agent in agents:
-        if encryptor.compare_password(agent.admin_password, password) and agent.admin_username == agent_username:
-            agent_cruds.update_agent_is_logged_in(agent)
+    if encryptor.compare_password(agent.admin_password, password) and agent.admin_username == agent_username:
+        agent_cruds.update_agent_is_logged_in(agent)
 
-            loan.send_message(message.chat.id, "Вы успешно вошли в аккаунт")
-            buttons_if_logged_in(message, loan)
+        loan.send_message(message.chat.id, "Вы успешно вошли в аккаунт")
+        buttons_if_logged_in(message, loan)
 
-            return True
+        return True
 
-        loan.send_message(message.chat.id, "Пароль неверен. Повторите попытку /start")
-        return False
+    loan.send_message(message.chat.id, "Пароль неверен. Повторите попытку /start")
+    return False

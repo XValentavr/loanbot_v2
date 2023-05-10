@@ -21,6 +21,13 @@ class AgentCruds:
         )
 
     @staticmethod
+    def get_agents_to_check_balance(agent):
+        return (
+            session.query(LoanAdminsModel)
+            .all()
+        )
+
+    @staticmethod
     def update_agent_is_logged_in(agent: LoanAdminsModel):
         agent.is_login = not agent.is_login
 

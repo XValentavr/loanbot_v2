@@ -5,21 +5,22 @@ from models.earning_model import EarningsModel
 from prettytable import PrettyTable
 
 
-def create_balance_message(earnings):
+def create_balance_message(earnings, include_history=True):
     """
     Create pretty table to chat
     :param earnings: current agent earnings
+    :param include_history: s
     :return: changed string
     """
     table = PrettyTable(['Валюта', 'Баланс'])
-
     balances = create_balance(earnings)
     history = create_balance_history(earnings)
     if balances or history:
         for currency, balance in balances.items():
             table.add_row([currency, balance])
-
-        return '```{}```'.format(table) + '\n' + history
+        if include_history:
+            return '```{}```'.format(table) + '\n' + history
+        return '```{}```'.format(table)
     return 'Баланса пока нет'
 
 
@@ -59,8 +60,7 @@ def create_balance(earnings) -> Dict:
 def create_balance_history(profits: List[EarningsModel]):
     history = []
     for number, profit in enumerate(profits):
-        if number < 10:
-            history.append(history_template(profit, number))
+        history.append(history_template(profit, number))
 
     return '\n'.join(history)
 

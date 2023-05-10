@@ -39,7 +39,7 @@ def check_if_dollar(currency):
 
 
 def check_if_uah(currency):
-    uah = ["uah", "грн", "грн.", "гривен", "гривен.", "гривень", "гривень.", "uah."]
+    uah = ["uah", "грн", "грн.", "гривен", "гривен.", "гривень", "гривны",  "гривень.", "uah."]
 
     pattern = '|'.join([re.escape(u) for u in uah])
     if bool(re.search(pattern, currency.lower())):

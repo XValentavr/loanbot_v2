@@ -5,14 +5,19 @@ from datetime import datetime, timedelta
 from cruds.source_of_income_cruds import source_of_income_cruds
 from helpers.apis.get_currency_api import get_actual_currency
 from helpers.enums.currency_enum import CurrencyEnum
+from helpers.income_and_profit.profit_last_two_weeks_calculator import generate_profit_table
 from models.admins import LoanAdminsModel
 
 
-def get_profit_of_other_dates(agent: LoanAdminsModel):
-    other_date = datetime.utcnow() - timedelta(weeks=2)
-    profits = source_of_income_cruds.get_source_percent_and_summa_by_username_other_date(agent.admin_username,
-                                                                                         other_date)
-    return create_table_for_other_profits(profits)
+def get_profit_of_other_dates(agent: LoanAdminsModel, calculate_date=True):
+    if calculate_date:
+        other_date = datetime.utcnow() - timedelta(weeks=2)
+        all_profit = source_of_income_cruds.get_source_percent_and_summa_by_username_other_date(agent.admin_username,
+                                                                                                other_date)
+        return create_table_for_other_profits(all_profit)
+    else:
+        all_profit = source_of_income_cruds.get_source_percent_all_agent_profit_by_limit(agent.admin_username)
+        return generate_profit_table(all_profit, is_for_main_agent=True)
 
 
 def create_table_for_other_profits(profits):

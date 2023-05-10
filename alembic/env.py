@@ -91,5 +91,4 @@ def run_migrations_online() -> None:
 if context.is_offline_mode():
     run_migrations_offline()
 else:
-    print('Creds.MYSQL_HOST', Creds.MYSQL_HOST)
     run_migrations_online()

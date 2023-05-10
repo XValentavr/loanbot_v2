@@ -1,6 +1,8 @@
 import uuid
 from typing import Optional
 
+from sqlalchemy import asc
+
 from create_engine import session
 from models.earning_model import EarningsModel
 
@@ -28,9 +30,19 @@ class EarningsCruds:
     def get_earning_by_agent_id(agent_id: uuid.UUID) -> EarningsModel:
         return (
             session.query(EarningsModel)
+            .order_by(asc(EarningsModel.time_created))
             .filter(EarningsModel.agent_source_id == agent_id)
             .all()
         )
+
+    @staticmethod
+    def get_earnings_history(agent_id: uuid.UUID, start: int, end: int) -> EarningsModel:
+        earnings = (
+            session.query(EarningsModel)
+            .filter(EarningsModel.agent_source_id == agent_id)
+            .all()
+        )
+        return earnings[start:end]
 
 
 earnings_cruds = EarningsCruds()

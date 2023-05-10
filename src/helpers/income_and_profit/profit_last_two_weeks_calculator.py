@@ -14,10 +14,11 @@ def get_profit_of_last_two_weeks(agent: LoanAdminsModel):
 
     profit = source_of_income_cruds.get_source_percent_and_summa_by_username_last_two_weeks(agent.admin_username,
                                                                                             two_weeks_ago)
+
     return generate_profit_table(profit)
 
 
-def generate_profit_table(profits: List[EarningsModel]):
+def generate_profit_table(profits: List[EarningsModel], is_for_main_agent=False):
     table = []
     earned = []
     if profits:
@@ -30,12 +31,17 @@ def generate_profit_table(profits: List[EarningsModel]):
                 earned.append(get_all_summa_of_profit(profit, uah, eur))
 
         if eur and uah and earned:
-            earnings = f'***ОБЩАЯ СУММА {round(float(escape_reserved_chars(str(sum(earned)))), 2)}$***'
+            earnings = f'***ОБЩАЯ СУММА {round(float(escape_reserved_chars(str(sum(earned)))), 2)}$***'.replace('.',
+                                                                                                                ',')
+
+            if is_for_main_agent:
+                return earnings
+
             table_data = '\n'.join(table)
             return '{}'.format(table_data.replace(".", ",")) + \
                    f'\nТекущие курсы: {str(uah).replace(".", ",")} грн/долл и' \
                    f' {str(eur).replace(".", ",")} долл/евро\n\n' + \
-                   str(earnings).replace('.', ',')
+                   earnings
         elif not eur or not uah:
             return "Произошла ошибка, попробуйте ещё раз"
 
@@ -74,9 +80,15 @@ def percent_calculator(summa, percent):
     return (float(summa) * float(percent)) / 100
 
 
-def create_profit_string(profit: EarningsModel):
+def create_profit_string(profit: EarningsModel, for_main_admin=False):
+    if not for_main_admin:
+        return f"{date_changer(str(profit.time_created))}" \
+               f" {profit.source_id.source} " \
+               f"{profit.source_id.percent}% от " \
+               f"{profit.summa} {profit.currency} \\= " \
+               f"{str(round(percent_calculator(percent=profit.source_id.percent, summa=profit.summa), 2))} {profit.currency}\n"
+
     return f"{date_changer(str(profit.time_created))}" \
-           f" {profit.source_id.source} " \
-           f"{profit.source_id.percent}% от " \
-           f"{profit.summa} {profit.currency} \\= " \
-           f"{str(round(percent_calculator(percent=profit.source_id.percent, summa=profit.summa), 2))} {profit.currency}\n"
+           f" {profit.source_id.source if float(profit.summa) > 0 else ''} " \
+           f"{profit.source_id.percent + ' % от ' if float(profit.summa) > 0 else ''}" \
+           f"***{escape_reserved_chars(str(profit.summa)).replace('.', ',')}*** {profit.currency}"

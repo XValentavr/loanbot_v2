@@ -4,10 +4,12 @@ import telebot
 from buttons.buttons_if_logged_in import buttons_if_logged_in
 from buttons.buttons_insert_data import buttons_insert_data
 from buttons.buttons_my_prev_incomes import buttons_get_previous_incomes
+from commands_handler.agent_balances_handler import handler_agent_balances
 from commands_handler.show_balance_handler import get_agent_balance
 from create_engine import session
 from cruds.agent_cruds import agent_cruds
 from helpers import creds
+from helpers.enums.helper_enum import HelperEnum
 
 from helpers.event_handler_helper import event_main_buttons_helper
 from helpers.decorators.is_logged_in_decorator import login_required
@@ -24,7 +26,7 @@ def send_welcome(message):
     agent = agent_cruds.get_by_username(username=message.from_user.username)
     if not agent.is_login:
         loan.send_message(message.chat.id, "Введите пароль")
-        loan.register_next_step_handler(message, lambda msg: check_password_and_set_privacy(msg, loan))
+        loan.register_next_step_handler(message, lambda msg: check_password_and_set_privacy(msg, loan, agent))
     else:
         buttons_if_logged_in(message, loan)
 
@@ -34,6 +36,16 @@ def send_welcome(message):
 def my_income(message):
     agent = agent_cruds.get_by_username(username=message.from_user.username)
     buttons_get_previous_incomes(message, loan, agent)
+
+
+@loan.message_handler(commands=["agents"])
+@login_required
+def my_income(message):
+    agent = agent_cruds.get_by_username(username=message.from_user.username)
+    if agent.admin_username == HelperEnum.MAIN_ADMIN_USERNAME:
+        handler_agent_balances(message, loan, agent)
+    else:
+        loan.send_message(message.chat.id, "У вас нет доступа к этой команде!")
 
 
 @loan.message_handler(commands=["balance"])
