@@ -5,6 +5,7 @@ from cruds.source_of_income_cruds import source_of_income_cruds
 from helpers.apis.get_currency_api import get_actual_currency
 from helpers.enums.currency_enum import CurrencyEnum
 from helpers.enums.inline_buttons_helper_enum import InlineButtonsHelperEnum
+from helpers.helper_functions import regex_escaper
 from models.admins import LoanAdminsModel
 from models.earning_model import EarningsModel
 
@@ -27,7 +28,7 @@ def generate_profit_table(profits: List[EarningsModel], is_for_main_agent=False)
         for profit in profits:
             # get earned money
             if profit.source_id.source != InlineButtonsHelperEnum.OTHER:
-                table.append(create_profit_string(profit))
+                table.append(regex_escaper(create_profit_string(profit)).replace('=', '\\='))
                 earned.append(get_all_summa_of_profit(profit, uah, eur))
 
         if eur and uah and earned:
@@ -85,10 +86,10 @@ def create_profit_string(profit: EarningsModel, for_main_admin=False):
         return f"{date_changer(str(profit.time_created))}" \
                f" {profit.source_id.source} " \
                f"{profit.source_id.percent}% от " \
-               f"{profit.summa} {profit.currency} \\= " \
+               f"{profit.summa} {profit.currency} = " \
                f"{str(round(percent_calculator(percent=profit.source_id.percent, summa=profit.summa), 2))} {profit.currency}\n"
 
-    return f"{date_changer(str(profit.time_created))}" \
-           f" {profit.source_id.source if float(profit.summa) > 0 else ''} " \
-           f"{profit.source_id.percent + ' % от ' if float(profit.summa) > 0 else ''}" \
-           f"***{escape_reserved_chars(str(profit.summa)).replace('.', ',')}*** {profit.currency}"
+    return regex_escaper(f"{date_changer(str(profit.time_created))}"
+                         f" {profit.source_id.source if float(profit.summa) > 0 else ''} "
+                         f"{profit.source_id.percent + ' % от ' if float(profit.summa) > 0 else ''}") \
+           + f"***{escape_reserved_chars(str(profit.summa)).replace('.', ',')}*** {profit.currency}"

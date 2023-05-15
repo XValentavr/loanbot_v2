@@ -2,6 +2,7 @@ import re
 
 from helpers.enums.currency_enum import CurrencyEnum
 from helpers.enums.error_enum import ErrorEnum
+from helpers.helper_functions import regex_escaper
 
 
 def extract_necessary_data(message):
@@ -20,7 +21,7 @@ def extract_comment(message):
     if match:
         amount = amount_checker(match.group(1))
         currency = check_if_dollar(match.group(2))
-        comment = comment_slasher(extract_agent_comment(message, [amount, match.group(2)]))
+        comment = regex_escaper(extract_agent_comment(message, [amount, match.group(2)]))
         if currency == ErrorEnum.CURRENCY_NOT_FOUND:
             return '', '', ErrorEnum.CURRENCY_NOT_FOUND
 
@@ -69,6 +70,3 @@ def amount_checker(amount):
         return amount.replace(',', '.')
     return amount
 
-
-def comment_slasher(comment):
-    return comment.replace('.', '\\.')
