@@ -24,6 +24,7 @@ class AgentCruds:
     def get_agents_to_check_balance(agent):
         return (
             session.query(LoanAdminsModel)
+            .filter(LoanAdminsModel.admin_username != agent.admin_username)
             .all()
         )
 

@@ -1,8 +1,7 @@
 import uuid
 from typing import Union
 
-from sqlalchemy import extract, func
-from sqlalchemy.orm import joinedload
+from sqlalchemy import extract, func, asc
 
 from create_engine import session
 from models.admins import LoanAdminsModel
@@ -48,6 +47,7 @@ class SourceOfIncomeCruds:
             session.query(EarningsModel)
             .join(EarningsModel.agent_id)
             .join(EarningsModel.source_id)
+            .order_by(asc(EarningsModel.time_created))
             .filter(LoanAdminsModel.admin_username == username)
             .filter(EarningsModel.time_created >= date_to_check)
             .all()
@@ -59,6 +59,7 @@ class SourceOfIncomeCruds:
             session.query(EarningsModel)
             .join(EarningsModel.agent_id)
             .join(EarningsModel.source_id)
+            .order_by(asc(EarningsModel.time_created))
             .filter(LoanAdminsModel.admin_username == username)
             .all()
         )

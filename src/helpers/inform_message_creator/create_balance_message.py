@@ -1,6 +1,8 @@
+import re
 from typing import List, Dict
 
 from helpers.enums.currency_enum import CurrencyEnum
+from helpers.helper_functions import regex_escaper
 from models.earning_model import EarningsModel
 from prettytable import PrettyTable
 
@@ -67,12 +69,11 @@ def create_balance_history(profits: List[EarningsModel]):
 
 def history_template(profit: EarningsModel, number):
     from helpers.income_and_profit.profit_last_two_weeks_calculator import date_changer
-    return f"{number + 1}\\. {date_changer(str(profit.time_created))}: {escaper(profit)} "
+    return regex_escaper(f"{number + 1}. {date_changer(str(profit.time_created))}: ") + f"{escaper(profit)}"
 
 
 def escaper(profit):
     if '-' in profit.summa:
-        string = str(profit.summa).replace('-', '\\-')
-        string = string.replace('.', ',')
-        return f"***{string}{profit.currency}*** {profit.comment}"
-    return f"\\+{str(profit.summa).replace('.', ',')}{profit.currency} от {profit.source_id.source}"
+        string = profit.summa.replace('.', ',')
+        return f"***{regex_escaper(string)}{profit.currency}*** {profit.comment}"
+    return regex_escaper(f"+{str(profit.summa).replace('.', ',')}{profit.currency} от {profit.source_id.source}")
