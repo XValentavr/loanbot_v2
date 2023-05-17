@@ -11,3 +11,4 @@ class InlineButtonsEnum(str, enum.Enum):
 
     EARNINGS: str = 'earnings'
     EXPENSE: str = 'expense'
+    WITHDRAWAL: str = 'withdrawal'

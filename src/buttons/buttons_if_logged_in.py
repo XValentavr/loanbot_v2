@@ -15,6 +15,7 @@ def buttons_if_logged_in(message, loan):
     balance = types.InlineKeyboardButton(text='Баланс', callback_data=InlineButtonsEnum.BALANCE)
     incomes = types.InlineKeyboardButton(text='Мои доходы', callback_data=InlineButtonsEnum.INCOME)
     insert_data = types.InlineKeyboardButton(text='Внести операцию', callback_data=InlineButtonsEnum.INSERT)
-    keyboard.row(balance, incomes, insert_data)
+    withdraw = types.InlineKeyboardButton(text='Вывести', callback_data=InlineButtonsEnum.WITHDRAWAL)
+    keyboard.row(balance, incomes, insert_data, withdraw)
 
     loan.send_message(message.chat.id, 'Выберите команду', reply_markup=keyboard)

@@ -2,7 +2,7 @@ from typing import List
 
 from telebot import types
 
-from helpers.enums.helper_enum import HelperEnum
+from helpers.enums.helper_main_agent_enum import HelperMainAgentEnum
 from models.admins import LoanAdminsModel
 
 
@@ -33,6 +33,6 @@ def buttons_agent_history(message, loan, message_data):
     :return: None
     """
     keyboard = types.InlineKeyboardMarkup()
-    key = types.InlineKeyboardButton(text='Показать историю', callback_data=HelperEnum.MORE_HISTORY)
+    key = types.InlineKeyboardButton(text='Показать историю', callback_data=HelperMainAgentEnum.MORE_HISTORY)
     keyboard.add(key)
     loan.send_message(chat_id=message.chat.id, text=message_data, reply_markup=keyboard, parse_mode='MarkdownV2')

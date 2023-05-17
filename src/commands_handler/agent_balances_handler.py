@@ -1,8 +1,10 @@
 from buttons.buttons_agents_balances import buttons_all_agents, buttons_agent_history
 from cruds.agent_cruds import agent_cruds
 from cruds.earning_cruds import earnings_cruds
-from helpers.enums.helper_enum import HelperEnum
-from helpers.income_and_profit.profit_last_two_weeks_calculator import create_profit_string
+from cruds.withdrawal_cruds import withdraw_cruds
+from helpers.enums.helper_main_agent_enum import HelperMainAgentEnum
+from helpers.helper_functions import regex_escaper
+from helpers.income_and_profit.profit_last_two_weeks_calculator import create_profit_string, include_withdrawal
 from helpers.income_and_profit.profit_other_date_calculator import get_profit_of_other_dates
 from helpers.inform_message_creator.create_balance_message import create_balance_message
 
@@ -35,7 +37,8 @@ def get_agents_balance(message, loan, agent_username):
     balance = create_balance_message(earnings, include_history=False)
     all_profits = get_profit_of_other_dates(agent_to_check, calculate_date=False)
 
-    history = '\n'.join(create_incomes_story(get_history(agent_to_check, start=0, end=int(HelperEnum.LIMIT))))
+    history = '\n'.join(
+        create_incomes_story(get_history(agent_to_check, start=0, end=int(HelperMainAgentEnum.LIMIT)))) + '\n\n'
 
     message_of_agent = create_message(balance, all_profits, history)
 
@@ -54,7 +57,7 @@ def get_more_history(message, loan, agent_username, start, end):
     agent_to_check = agent_cruds.get_by_username(agent_username)
 
     history = '\n'.join(create_incomes_story(get_history(agent_to_check, start, end)))
-    if len(history) > int(HelperEnum.LIMIT):
+    if len(history) > int(HelperMainAgentEnum.LIMIT):
         buttons_agent_history(message, loan, history)
     else:
         loan.send_message(chat_id=message.chat.id, text='Больше ничего не найдено')
@@ -89,3 +92,7 @@ def create_incomes_story(earnings):
     :return:
     """
     return [create_profit_string(profit, for_main_admin=True) for profit in earnings]
+
+
+def get_withdrawal_string(withdrawal):
+    return [f'***{regex_escaper(include_withdrawal(withdraw))}***' for withdraw in withdrawal]

@@ -71,8 +71,7 @@ def ready_event(message, agent, loan, source, expense):
 
             buttons_if_logged_in(message, loan)
     except Exception:
-        loan.send_message(message.chat.id, "Что-то пошло не так, попробуйте ещё раз", reply_to_message_id=message.id)
-        base_data_handler(message, loan)
+        loan.send_message(message.chat.id, "Что-то пошло не так, попробуйте ещё раз", reply_to_message_id=message.id, reply_markup=buttons_back())
 
 
 def change_event(message, loan):

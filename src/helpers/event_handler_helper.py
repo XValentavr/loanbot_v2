@@ -2,6 +2,7 @@ from typing import Dict
 
 from buttons.buttons_back import buttons_back
 from buttons.buttons_if_logged_in import buttons_if_logged_in
+from buttons.buttons_main_agent import buttons_main_agents_commands
 from commands_handler.agent_balances_handler import get_agents_balance, get_more_history
 from commands_handler.base_data_expense_or_earnings_handler import ready_event, change_event
 from buttons.buttons_insert_data import buttons_insert_data
@@ -12,10 +13,11 @@ from commands_handler.expense_data_handler import expense_data_handler
 from commands_handler.show_balance_handler import get_agent_balance
 from cruds.agent_cruds import agent_cruds
 from cruds.source_of_income_cruds import source_of_income_cruds
-from helpers.enums.helper_enum import HelperEnum
+from helpers.enums.helper_main_agent_enum import HelperMainAgentEnum
 from helpers.enums.inline_buttons_enum import InlineButtonsEnum
 from helpers.enums.inline_buttons_helper_enum import InlineButtonsHelperEnum
 from helpers.income_and_profit.profit_other_date_calculator import get_profit_of_other_dates
+from helpers.withdrawal_helper import withdrawal_helper, create_withdrawn_for_main_agent
 
 agent_set_income_source: Dict = {}
 has_expense: Dict = {}
@@ -27,13 +29,20 @@ def event_main_buttons_helper(call, agent, loan):
     if call.data == InlineButtonsEnum.BALANCE:
         get_agent_balance(message=call.message, loan=loan, agent=agent)
 
+    elif call.data == InlineButtonsEnum.WITHDRAWAL:
+        withdrawal_helper(message=call.message, loan=loan, agent=agent)
+
     elif call.data == InlineButtonsEnum.BACK:
         buttons_if_logged_in(call.message, loan)
 
     elif call.data == InlineButtonsEnum.INCOME:
+        loan.clear_step_handler_by_chat_id(call.message.chat.id)
+
         buttons_get_previous_incomes(message=call.message, loan=loan, agent=agent)
 
     elif call.data == InlineButtonsEnum.INSERT:
+        loan.clear_step_handler_by_chat_id(call.message.chat.id)
+
         buttons_insert_data(call.message, loan)
 
     elif call.data == InlineButtonsEnum.EXPENSE:
@@ -97,16 +106,21 @@ def event_other_buttons_helper(call, agent, loan):
 def main_agent_command_helper(call, loan, agent):
     all_agents = [agent.admin_username for agent in agent_cruds.get_all_agents()]
     if call.data in all_agents:
-        limit_dict['limit'] = int(HelperEnum.LIMIT)
-        get_agents_balance(message=call.message,
-                           loan=loan,
-                           agent_username=call.data)
+        buttons_main_agents_commands(call.message, loan)
         main_agent_get_info_about[agent.admin_username] = call.data
 
-    elif call.data == HelperEnum.MORE_HISTORY:
-        limit_dict['limit'] += int(HelperEnum.LIMIT)
+    elif call.data == HelperMainAgentEnum.MAIN_AGENT_HISTORY:
+        limit_dict['limit'] = int(HelperMainAgentEnum.LIMIT)
+        get_agents_balance(message=call.message,
+                           loan=loan,
+                           agent_username=main_agent_get_info_about[agent.admin_username])
+    elif call.data == HelperMainAgentEnum.MAIN_AGENT_WITHDRAW:
+        create_withdrawn_for_main_agent(call.message, loan,
+                                        agent_username=main_agent_get_info_about[agent.admin_username])
+    elif call.data == HelperMainAgentEnum.MORE_HISTORY:
+        limit_dict['limit'] += int(HelperMainAgentEnum.LIMIT)
         get_more_history(message=call.message,
                          loan=loan,
                          agent_username=main_agent_get_info_about[agent.admin_username],
-                         start=limit_dict.get('limit') - int(HelperEnum.LIMIT),
+                         start=limit_dict.get('limit') - int(HelperMainAgentEnum.LIMIT),
                          end=limit_dict.get('limit'))

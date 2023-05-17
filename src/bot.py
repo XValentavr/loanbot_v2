@@ -9,12 +9,13 @@ from commands_handler.show_balance_handler import get_agent_balance
 from create_engine import session
 from cruds.agent_cruds import agent_cruds
 from helpers import creds
-from helpers.enums.helper_enum import HelperEnum
+from helpers.enums.helper_main_agent_enum import HelperMainAgentEnum
 
 from helpers.event_handler_helper import event_main_buttons_helper
 from helpers.decorators.is_logged_in_decorator import login_required
 
 from helpers.check_password import check_password_and_set_privacy
+from helpers.withdrawal_helper import withdrawal_helper
 
 loan = telebot.TeleBot(creds.Creds.LOAN_BOT_ID)
 logging.basicConfig(filename="sample.log", level=logging.ERROR)
@@ -38,11 +39,18 @@ def my_income(message):
     buttons_get_previous_incomes(message, loan, agent)
 
 
+@loan.message_handler(commands=["withdraw"])
+@login_required
+def my_withdrawal(message):
+    agent = agent_cruds.get_by_username(username=message.from_user.username)
+    withdrawal_helper(message, loan, agent)
+
+
 @loan.message_handler(commands=["agents"])
 @login_required
 def my_income(message):
     agent = agent_cruds.get_by_username(username=message.from_user.username)
-    if agent.admin_username == HelperEnum.MAIN_ADMIN_USERNAME:
+    if agent.admin_username in HelperMainAgentEnum.MAIN_ADMIN_USERNAME:
         handler_agent_balances(message, loan, agent)
     else:
         loan.send_message(message.chat.id, "У вас нет доступа к этой команде!")

@@ -3,6 +3,7 @@ import calendar
 from datetime import datetime, timedelta
 
 from cruds.source_of_income_cruds import source_of_income_cruds
+from cruds.withdrawal_cruds import withdraw_cruds
 from helpers.apis.get_currency_api import get_actual_currency
 from helpers.enums.currency_enum import CurrencyEnum
 from helpers.income_and_profit.profit_last_two_weeks_calculator import generate_profit_table
@@ -17,7 +18,8 @@ def get_profit_of_other_dates(agent: LoanAdminsModel, calculate_date=True):
         return create_table_for_other_profits(all_profit)
     else:
         all_profit = source_of_income_cruds.get_source_percent_all_agent_profit_by_limit(agent.admin_username)
-        return generate_profit_table(all_profit, is_for_main_agent=True)
+        withdrawal = withdraw_cruds.get_all_by_agent_username(agent=agent)
+        return generate_profit_table(all_profit, is_for_main_agent=True, for_withdrawal=False, withdrawal=withdrawal)
 
 
 def create_table_for_other_profits(profits):
