@@ -3,7 +3,6 @@ from datetime import date
 from buttons.buttons_agents_balances import buttons_all_agents, buttons_agent_history
 from cruds.agent_cruds import agent_cruds
 from cruds.earning_cruds import earnings_cruds
-from cruds.withdrawal_cruds import withdraw_cruds
 from helpers.enums.helper_main_agent_enum import HelperMainAgentEnum
 from helpers.helper_functions import regex_escaper
 from helpers.income_and_profit.profit_last_two_weeks_calculator import create_profit_string, include_withdrawal, \
