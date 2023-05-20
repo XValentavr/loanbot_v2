@@ -8,6 +8,7 @@ from cruds.source_of_income_cruds import source_of_income_cruds
 from helpers.enums.error_enum import ErrorEnum
 from helpers.enums.inline_buttons_helper_enum import InlineButtonsHelperEnum
 from helpers.income_and_profit.extract_summa_and_currency import extract_necessary_data
+from helpers.inform_message_creator.create_balance_message import check_if_float
 
 other_source: Dict = {}
 
@@ -86,5 +87,6 @@ def check_type_of_transaction_and_revert_amount(expense, amount):
     :return: reverted amount
     """
     if expense:
-        return str(float(amount) * -1)
+
+        return str(check_if_float(amount) * -1)
     return amount

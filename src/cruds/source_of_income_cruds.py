@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 from typing import Union
 
 from sqlalchemy import extract, func, asc
@@ -43,13 +44,16 @@ class SourceOfIncomeCruds:
 
     @staticmethod
     def get_source_percent_and_summa_by_username_last_two_weeks(username: str, date_to_check) -> Union[EarningsModel]:
+        interval_start = date_to_check[0].strftime("%Y-%m-%d")
+        interval_end = date_to_check[1].strftime("%Y-%m-%d")
+
         return (
             session.query(EarningsModel)
             .join(EarningsModel.agent_id)
             .join(EarningsModel.source_id)
             .order_by(asc(EarningsModel.time_created))
             .filter(LoanAdminsModel.admin_username == username)
-            .filter(EarningsModel.time_created >= date_to_check)
+            .filter(EarningsModel.time_created.between(interval_start, interval_end))
             .all()
         )
 
@@ -66,6 +70,7 @@ class SourceOfIncomeCruds:
 
     @staticmethod
     def get_source_percent_and_summa_by_username_other_date(username: str, date_to_check) -> Union[EarningsModel]:
+        interval_end = date_to_check.strftime("%Y-%m-%d")
         return (session.query(
             extract('month', EarningsModel.time_created).label('month'),
             extract('year', EarningsModel.time_created).label('year'),
@@ -74,7 +79,7 @@ class SourceOfIncomeCruds:
         ).join(EarningsModel.agent_id)
                 .join(EarningsModel.source_id)
                 .filter(LoanAdminsModel.admin_username == username)
-                .filter(EarningsModel.time_created < date_to_check)
+                .filter(EarningsModel.time_created < interval_end)
                 .group_by('year', 'month', EarningsModel.currency)
                 .all())
 

@@ -36,11 +36,23 @@ class EarningsCruds:
         )
 
     @staticmethod
-    def get_earnings_history(agent_id: uuid.UUID, start: int, end: int) -> EarningsModel:
+    def get_earnings_history_by_date(agent_id: uuid.UUID, start: int, end: int, date_to_check) -> EarningsModel:
+        if isinstance(date_to_check, list):
+            interval_start = date_to_check[0].strftime("%Y-%m-%d")
+            interval_end = date_to_check[1].strftime("%Y-%m-%d")
+
+            return (
+                session.query(EarningsModel)
+                .order_by(desc(EarningsModel.time_created))
+                .filter(EarningsModel.agent_source_id == agent_id)
+                .filter(EarningsModel.time_created.between(interval_start, interval_end))
+                .all()
+            )
         earnings = (
             session.query(EarningsModel)
             .order_by(desc(EarningsModel.time_created))
             .filter(EarningsModel.agent_source_id == agent_id)
+            .filter(EarningsModel.time_created < date_to_check)
             .all()
         )
         return earnings[start:end]

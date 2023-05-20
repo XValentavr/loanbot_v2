@@ -19,7 +19,7 @@ def withdrawal_helper(message, loan, agent):
     :return: None
     """
     loan.send_message(message.chat.id,
-                      f'Доступного {get_profit_of_last_two_weeks(agent, for_withdrawal=True)}\n\nВведите сумму для снятия',
+                      f'Доступно {get_profit_of_last_two_weeks(agent, for_withdrawal=True)}\n\nВведите сумму для снятия',
                       parse_mode='MarkdownV2', reply_markup=buttons_back())
     loan.register_next_step_handler(message, lambda msg: withdrawal_next_step(msg, loan, agent))
 
@@ -38,7 +38,7 @@ def withdrawal_next_step(message, loan, agent):
 def create_withdrawn_for_main_agent(message, loan, agent_username):
     agent_to_check = agent_cruds.get_by_username(agent_username)
 
-    all_withdraw = withdraw_cruds.get_all_by_agent_id(agent=agent_to_check)
+    all_withdraw = withdraw_cruds.get_all_by_agent_id_and_time(agent=agent_to_check, date_to_check=None)
 
     profit = source_of_income_cruds.get_source_percent_all_agent_profit_by_limit(agent_username)
 

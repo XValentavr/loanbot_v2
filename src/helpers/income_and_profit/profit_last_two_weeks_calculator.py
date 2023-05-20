@@ -1,4 +1,5 @@
-from datetime import datetime, timedelta
+import re
+from datetime import datetime
 from typing import List
 
 from cruds.source_of_income_cruds import source_of_income_cruds
@@ -12,13 +13,24 @@ from models.earning_model import EarningsModel
 
 
 def get_profit_of_last_two_weeks(agent: LoanAdminsModel, for_withdrawal=False):
-    two_weeks_ago = datetime.utcnow() - timedelta(weeks=2)
+    first_part, second_part = create_proportional_parts_of_month()
 
-    profit = source_of_income_cruds.get_source_percent_and_summa_by_username_last_two_weeks(agent.admin_username,
-                                                                                            two_weeks_ago)
-    withdrawal = withdraw_cruds.get_all_by_agent_id(agent=agent)
+    profit_for_first_part = source_of_income_cruds.get_source_percent_and_summa_by_username_last_two_weeks(
+        agent.admin_username, first_part)
+    withdrawal_first = withdraw_cruds.get_all_by_agent_id_and_time(agent=agent, date_to_check=first_part)
 
-    return generate_profit_table(profit, withdrawal, for_withdrawal)
+    first_month_part_result = generate_profit_table(profit_for_first_part, withdrawal_first, for_withdrawal)
+
+    # get for second part of a month
+    profit_for_second_part = source_of_income_cruds.get_source_percent_and_summa_by_username_last_two_weeks(
+        agent.admin_username, second_part)
+
+    withdrawal_second = withdraw_cruds.get_all_by_agent_id_and_time(agent=agent, date_to_check=second_part)
+
+    second_month_part_result = generate_profit_table(profit_for_second_part, withdrawal_second, for_withdrawal)
+
+    # generate result
+    return generate_string_for_graded_month(first_month_part_result, second_month_part_result)
 
 
 def generate_profit_table(profits: List[EarningsModel],
@@ -44,7 +56,8 @@ def generate_profit_table(profits: List[EarningsModel],
                 withdrawal_to_string = [f'***{regex_escaper(include_withdrawal(withdraw))}***' for withdraw in
                                         withdrawal]
                 withdrawal_summa = get_withdrawal_summa(withdrawal)
-            earnings = create_profit_template(earned, withdrawal_summa, for_main_agent_withdrawal= for_main_agent_withdrawal)
+            earnings = create_profit_template(earned, withdrawal_summa,
+                                              for_main_agent_withdrawal=for_main_agent_withdrawal)
 
             if is_for_main_agent or for_withdrawal:
                 return earnings
@@ -115,3 +128,47 @@ def include_withdrawal(withdrawal):
 
 def get_withdrawal_summa(withdrawal):
     return sum([int(withdraw.summa) for withdraw in withdrawal])
+
+
+def create_proportional_parts_of_month():
+    from datetime import date, timedelta
+
+    today = date.today()
+    current_month = today.month
+    current_year = today.year
+
+    # Get the number of days in the current month
+    days_in_month = date(current_year, current_month + 1, 1) - date(current_year, current_month, 1)
+    # Calculate the start and end dates of the two proportional parts
+    interval_start_first = date(current_year, current_month, 1)
+    interval_end_first = date(current_year, current_month, int(days_in_month.days / 2))
+
+    interval_start_second = interval_end_first + timedelta(days=1)
+    interval_end_second = date(current_year, current_month, days_in_month.days)
+
+    return [interval_start_first, interval_end_first], [interval_start_second, interval_end_second]
+
+
+def generate_string_for_graded_month(first_part, second_part, for_main_agent=False):
+    part_1, part_2 = create_proportional_parts_of_month()
+    first_part_string = second_part_string = ''
+    if 'пока нет' not in first_part and first_part:
+        first_part_string = f'``` {part_1[0].strftime("%d %B")}\\-{part_1[1].strftime("%d %B")}``` \n\n' \
+                            f'{first_part}'
+    if 'пока нет' not in second_part and second_part:
+        second_part_string = f'\n\n``` {part_2[0].strftime("%d %B")}\\-{part_2[1].strftime("%d %B")}``` \n\n' \
+                             f'{second_part}'
+
+    complex_string = first_part_string + second_part_string
+    if for_main_agent:
+        return complex_string
+    return complex_string + get_general_summa_per_month(first_part, second_part)
+
+
+def get_general_summa_per_month(first_part, second_part):
+    first_summa = re.findall(r'(\-?\d+\\,\d+)\$', first_part)[-1] if 'пока нет' not in first_part else 0
+    second_summa = re.findall(r'(\-?\d+\\,\d+)\$', second_part)[-1] if 'пока нет' not in second_part else 0
+
+    final_summa = float(str(first_summa).replace(",", ".").replace("\\", "")) + float(
+        str(second_summa).replace(",", ".").replace("\\", ""))
+    return f'\n\n``` СУММА ЗА МЕСЯЦ {round(final_summa, 2)}$```'.replace('.', ',')

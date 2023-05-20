@@ -1,6 +1,6 @@
 import calendar
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 from cruds.source_of_income_cruds import source_of_income_cruds
 from cruds.withdrawal_cruds import withdraw_cruds
@@ -12,9 +12,11 @@ from models.admins import LoanAdminsModel
 
 def get_profit_of_other_dates(agent: LoanAdminsModel, calculate_date=True):
     if calculate_date:
-        other_date = datetime.utcnow() - timedelta(weeks=2)
+        today = date.today()
+        first_day_of_current_month = date(today.year, today.month, 1)
+
         all_profit = source_of_income_cruds.get_source_percent_and_summa_by_username_other_date(agent.admin_username,
-                                                                                                other_date)
+                                                                                                first_day_of_current_month)
         return create_table_for_other_profits(all_profit)
     else:
         all_profit = source_of_income_cruds.get_source_percent_all_agent_profit_by_limit(agent.admin_username)

@@ -17,7 +17,17 @@ class WithdrawalCruds:
         session.commit()
 
     @staticmethod
-    def get_all_by_agent_id(agent: LoanAdminsModel) -> WithdrawModel:
+    def get_all_by_agent_id_and_time(agent: LoanAdminsModel, date_to_check) -> WithdrawModel:
+        if date_to_check:
+            interval_start = date_to_check[0].strftime("%Y-%m-%d")
+            interval_end = date_to_check[1].strftime("%Y-%m-%d")
+
+            return (
+                session.query(WithdrawModel)
+                .filter(WithdrawModel.agent_source_id == agent.id)
+                .filter(WithdrawModel.time_created.between(interval_start, interval_end))
+                .all()
+            )
         return (
             session.query(WithdrawModel)
             .filter(WithdrawModel.agent_source_id == agent.id)

@@ -110,7 +110,7 @@ def main_agent_command_helper(call, loan, agent):
         main_agent_get_info_about[agent.admin_username] = call.data
 
     elif call.data == HelperMainAgentEnum.MAIN_AGENT_HISTORY:
-        limit_dict['limit'] = int(HelperMainAgentEnum.LIMIT)
+        limit_dict['limit'] = 0
         get_agents_balance(message=call.message,
                            loan=loan,
                            agent_username=main_agent_get_info_about[agent.admin_username])

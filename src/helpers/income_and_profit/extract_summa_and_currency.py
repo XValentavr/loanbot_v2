@@ -16,8 +16,7 @@ def extract_comment(message):
     :param message: incame string to check
     :return: amount, currency and comment
     """
-    match = re.search(r'(\d+(?:\.\d+)?)\s+(\w+)', message)
-
+    match = re.match(r"(-?[\d,.]+)\s*([a-zA-Zа-яА-Я]+)\s*(.*)", message)
     if match:
         amount = amount_checker(match.group(1))
         currency = check_if_dollar(match.group(2))
@@ -40,7 +39,7 @@ def check_if_dollar(currency):
 
 
 def check_if_uah(currency):
-    uah = ["uah", "грн", "грн.", "гривен", "гривен.", "гривень", "гривны",  "гривень.", "uah."]
+    uah = ["uah", "грн", "грн.", "гривен", "гривен.", "гривень", "гривны", "гривень.", "uah."]
 
     pattern = '|'.join([re.escape(u) for u in uah])
     if bool(re.search(pattern, currency.lower())):
@@ -61,7 +60,7 @@ def check_if_euro(currency):
 
 def extract_agent_comment(string_to_clear, words_to_remove):
     for word in words_to_remove:
-        string_to_clear = string_to_clear.replace(word, "")
+        string_to_clear = string_to_clear.replace(',', '.').replace(word, "")
     return string_to_clear.strip()
 
 
@@ -69,4 +68,3 @@ def amount_checker(amount):
     if ',' in amount:
         return amount.replace(',', '.')
     return amount
-
