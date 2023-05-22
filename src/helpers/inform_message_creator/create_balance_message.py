@@ -74,11 +74,13 @@ def history_template(profit: EarningsModel, number):
 
 def escaper(profit):
     checked = check_if_float(profit.summa)
+    prft = profit.comment.replace("\\", "")
     if '-' in str(checked):
         if isinstance(checked, float):
             checked = str(checked).replace('.', ',')
-        return f"***{regex_escaper(str(checked))}{profit.currency}*** {profit.comment}"
-    return regex_escaper(f"+{str(checked).replace('.', ',')}{profit.currency} от {profit.source_id.source}")
+        return f"***{regex_escaper(str(checked))}{profit.currency}*** {regex_escaper(prft)}"
+    return regex_escaper(
+        f"+{str(checked).replace('.', ',')}{profit.currency} от {profit.source_id.source}. {prft}")
 
 
 def check_if_float(profit_summa):
