@@ -16,11 +16,11 @@ def extract_comment(message):
     :param message: incame string to check
     :return: amount, currency and comment
     """
-    match = re.match(r"(-?[\d,.]+)\s*([a-zA-Zа-яА-Я]+)\s*(.*)", message)
+    match = re.match(r'(?P<summa>[0-9,.]+)\s*(?P<currency>[a-zA-Zа-яА-Я$€]+)\s*(?P<comment>.*)', message)
     if match:
-        amount = amount_checker(match.group(1))
-        currency = check_if_dollar(match.group(2))
-        comment = regex_escaper(extract_agent_comment(message, [amount, match.group(2)]))
+        amount = amount_checker(match.group('summa'))
+        currency = check_if_dollar(match.group('currency'))
+        comment = regex_escaper(match.group("comment"))
         if currency == ErrorEnum.CURRENCY_NOT_FOUND:
             return '', '', ErrorEnum.CURRENCY_NOT_FOUND
 
@@ -39,7 +39,7 @@ def check_if_dollar(currency):
 
 
 def check_if_uah(currency):
-    uah = ["uah", "грн", "грн.", "гривен", "гривен.", "гривень", "гривны", "гривень.", "uah."]
+    uah = ["uah", "грн", "грн.", "гривен", "гривен.", "гривень", "гривны", "гривень.", "uah.", "UAH", "UAH."]
 
     pattern = '|'.join([re.escape(u) for u in uah])
     if bool(re.search(pattern, currency.lower())):
@@ -49,7 +49,7 @@ def check_if_uah(currency):
 
 
 def check_if_euro(currency):
-    euros = ["eur", "euro", "eur.", "euro.", "евро", "евро.", "евр.", "евр", "євро.", "євро"]
+    euros = ["eur", "EUR", "EUR.", "€", "euro", "eur.", "euro.", "евро", "евро.", "евр.", "евр", "євро.", "євро"]
 
     pattern = '|'.join([re.escape(e) for e in euros])
     if bool(re.search(pattern, currency.lower())):
@@ -57,11 +57,6 @@ def check_if_euro(currency):
 
     return ErrorEnum.CURRENCY_NOT_FOUND
 
-
-def extract_agent_comment(string_to_clear, words_to_remove):
-    for word in words_to_remove:
-        string_to_clear = string_to_clear.replace(',', '.').replace(word, "")
-    return string_to_clear.strip()
 
 
 def amount_checker(amount):

@@ -78,7 +78,8 @@ def escaper(profit):
         if isinstance(checked, float):
             checked = str(checked).replace('.', ',')
         return f"***{regex_escaper(str(checked))}{profit.currency}*** {profit.comment}"
-    return regex_escaper(f"+{str(checked).replace('.', ',')}{profit.currency} от {profit.source_id.source}")
+    return regex_escaper(
+        f"+{str(checked).replace('.', ',')}{profit.currency} от {profit.source_id.source}. ") + profit.comment
 
 
 def check_if_float(profit_summa):
