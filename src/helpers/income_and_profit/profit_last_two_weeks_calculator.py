@@ -107,7 +107,7 @@ def percent_calculator(summa, percent):
 
 
 def create_profit_string(profit: EarningsModel, for_main_admin=False):
-    prft = profit.comment.replace("\\", "")
+    comment = profit.comment.replace("\\", "")
 
     if not for_main_admin:
         return f"{date_changer(str(profit.time_created))}" \
@@ -119,7 +119,7 @@ def create_profit_string(profit: EarningsModel, for_main_admin=False):
     return regex_escaper(f"{date_changer(str(profit.time_created))}"
                          f" {profit.source_id.source if float(profit.summa) > 0 else ''} "
                          f"{profit.source_id.percent + ' % от ' if float(profit.summa) > 0 else ''}") \
-           + f"***{escape_reserved_chars(str(profit.summa)).replace('.', ',')}*** {profit.currency}\\. {regex_escaper(prft)}"
+           + f"***{escape_reserved_chars(str(profit.summa)).replace('.', ',')}*** {profit.currency}\\. {regex_escaper(comment)}"
 
 
 def include_withdrawal(withdrawal):
