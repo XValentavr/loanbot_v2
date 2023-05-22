@@ -74,7 +74,6 @@ def history_template(profit: EarningsModel, number):
 
 def escaper(profit):
     checked = check_if_float(profit.summa)
-    prft = profit.comment.replace("\\", "")
     if '-' in str(checked):
         if isinstance(checked, float):
             checked = str(checked).replace('.', ',')
