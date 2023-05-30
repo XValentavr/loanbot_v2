@@ -4,6 +4,7 @@ from typing import Optional
 from sqlalchemy import desc
 
 from create_engine import session
+from cruds.source_of_income_cruds import source_of_income_cruds
 from models.earning_model import EarningsModel
 
 
@@ -14,12 +15,14 @@ class EarningsCruds:
                       source_id: Optional[str],
                       currency: str,
                       is_other_source: str):
+        source_name = source_of_income_cruds.get_source_by_source_id(source_id)
         source = EarningsModel(summa=summa,
                                comment=comment,
                                agent_source_id=agent_id,
                                income_source_id=source_id,
                                currency=currency,
-                               is_other_source=is_other_source)
+                               is_other_source=is_other_source,
+                               source_name=source_name.source)
 
         source.id = uuid.uuid4()
 

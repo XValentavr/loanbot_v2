@@ -39,18 +39,18 @@ def get_agents_balance(message, loan, agent_username):
     earnings = earnings_cruds.get_earning_by_agent_id(agent_to_check.id)
 
     balance = create_balance_message(earnings, include_history=False)
-    all_profits = get_profit_of_other_dates(agent_to_check, calculate_date=False)
-
-    history_first_part = '\n'.join(
+    profits_first_part = get_profit_of_other_dates(agent_to_check, calculate_date=False, partial=first_part)
+    history_first_part = profits_first_part + '\n\n' + '\n'.join(
         create_incomes_story(get_history(agent_to_check, date_to_check=first_part))) + '\n\n'
 
-    history_second_part = '\n'.join(
+    profits_second_part = get_profit_of_other_dates(agent_to_check, calculate_date=False, partial=second_part)
+    history_second_part = profits_second_part + '\n\n' + '\n'.join(
         create_incomes_story(get_history(agent_to_check, date_to_check=second_part))) + '\n\n'
 
     complex_history = generate_string_for_graded_month(history_first_part.strip(), history_second_part.strip(),
                                                        for_main_agent=True)
 
-    message_of_agent = create_message(balance, all_profits, complex_history.strip())
+    message_of_agent = create_message(balance, complex_history.strip())
 
     buttons_agent_history(message, loan, message_of_agent)
 
@@ -76,7 +76,7 @@ def get_more_history(message, loan, agent_username, start, end):
         loan.send_message(chat_id=message.chat.id, text='Больше ничего не найдено')
 
 
-def create_message(balance, all_profits, history):
+def create_message(balance, history):
     """
     Create message of initial request by main admin
     :param balance: balance of agent
@@ -84,7 +84,7 @@ def create_message(balance, all_profits, history):
     :param history: comments of
     :return:
     """
-    return f'{balance}\n{all_profits}\n\n\n{history}'
+    return f'{balance}\n\n{history}'
 
 
 def get_history(agent, date_to_check, start=0, end=int(HelperMainAgentEnum.LIMIT), ):

@@ -3,8 +3,6 @@ import uuid
 from sqlalchemy import Column, String
 from sqlalchemy.orm import DeclarativeMeta, registry
 
-from sqlalchemy.dialects.postgresql import UUID
-
 mapper_registry = registry()
 
 

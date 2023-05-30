@@ -6,11 +6,12 @@ from cruds.source_of_income_cruds import source_of_income_cruds
 from cruds.withdrawal_cruds import withdraw_cruds
 from helpers.apis.get_currency_api import get_actual_currency
 from helpers.enums.currency_enum import CurrencyEnum
-from helpers.income_and_profit.profit_last_two_weeks_calculator import generate_profit_table
+from helpers.income_and_profit.profit_last_two_weeks_calculator import generate_profit_table, \
+    create_proportional_parts_of_month
 from models.admins import LoanAdminsModel
 
 
-def get_profit_of_other_dates(agent: LoanAdminsModel, calculate_date=True):
+def get_profit_of_other_dates(agent: LoanAdminsModel, calculate_date=True, partial=None):
     if calculate_date:
         today = date.today()
         first_day_of_current_month = date(today.year, today.month, 1)
@@ -19,9 +20,11 @@ def get_profit_of_other_dates(agent: LoanAdminsModel, calculate_date=True):
                                                                                                 first_day_of_current_month)
         return create_table_for_other_profits(all_profit)
     else:
-        all_profit = source_of_income_cruds.get_source_percent_all_agent_profit_by_limit(agent.admin_username)
-        withdrawal = withdraw_cruds.get_all_by_agent_username(agent=agent)
-        return generate_profit_table(all_profit, is_for_main_agent=True, for_withdrawal=False, withdrawal=withdrawal)
+        withdrawal = withdraw_cruds.get_all_by_agent_id_and_time(agent=agent, date_to_check=partial)
+        profit = source_of_income_cruds.get_source_percent_and_summa_by_username_last_two_weeks(
+            agent.admin_username, partial)
+        return generate_profit_table(profit, is_for_main_agent=True, for_withdrawal=False,
+                                     withdrawal=withdrawal)
 
 
 def create_table_for_other_profits(profits):

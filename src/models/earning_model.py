@@ -32,3 +32,4 @@ class EarningsModel(BaseModel):
     is_other_source = Column(String(255), nullable=True)
 
     time_created = Column(DateTime(timezone=True), server_default=func.now())
+    source_name = Column(String(255), nullable=True)
