@@ -9,6 +9,7 @@ from helpers.enums.error_enum import ErrorEnum
 from helpers.enums.inline_buttons_helper_enum import InlineButtonsHelperEnum
 from helpers.income_and_profit.extract_summa_and_currency import extract_necessary_data
 from helpers.inform_message_creator.create_balance_message import check_if_float
+from send_to_owner.send_message_to_owner import send_message_to_owner
 
 other_source: Dict = {}
 
@@ -48,29 +49,33 @@ def ready_event(message, agent, loan, source, expense):
     :param expense: if transaction is expense
     :return: None
     """
+    try:
+        amount, currency, text = extract_necessary_data(message.text)
 
-    amount, currency, text = extract_necessary_data(message.text)
+        if text == ErrorEnum.CURRENCY_NOT_FOUND:
+            loan.send_message(message.chat.id, ErrorEnum.CURRENCY_NOT_FOUND, reply_to_message_id=message.id)
+            base_data_handler(message, loan)
+        else:
+            earning = earnings_cruds.insert_source(summa=check_type_of_transaction_and_revert_amount(expense, amount),
+                                                   comment=text.split('верно?')[0].strip(),
+                                                   source_id=source.id if not other_source.get(
+                                                       agent.admin_username) and not expense else source_of_income_cruds.get_source_by_source_name(
+                                                       InlineButtonsHelperEnum.OTHER).id,
+                                                   agent_id=agent.id,
+                                                   currency=currency,
+                                                   is_other_source=other_source.get(
+                                                       agent.admin_username) if other_source.get(
+                                                       agent.admin_username) and not expense else None)
 
-    if text == ErrorEnum.CURRENCY_NOT_FOUND:
-        loan.send_message(message.chat.id, ErrorEnum.CURRENCY_NOT_FOUND, reply_to_message_id=message.id)
-        base_data_handler(message, loan)
-    else:
-        earnings_cruds.insert_source(summa=check_type_of_transaction_and_revert_amount(expense, amount),
-                                     comment=text.split('верно?')[0].strip(),
-                                     source_id=source.id if not other_source.get(
-                                         agent.admin_username) and not expense else source_of_income_cruds.get_source_by_source_name(
-                                         InlineButtonsHelperEnum.OTHER).id,
-                                     agent_id=agent.id,
-                                     currency=currency,
-                                     is_other_source=other_source.get(agent.admin_username) if other_source.get(
-                                         agent.admin_username) and not expense else None)
+            loan.send_message(message.chat.id, "Транзакция успешная!")
+            send_message_to_owner(loan, earning, agent.admin_username)
+            if other_source.get(agent.admin_username):
+                del other_source[agent.admin_username]
 
-        loan.send_message(message.chat.id, "Транзакция успешная!")
-
-        if other_source.get(agent.admin_username):
-            del other_source[agent.admin_username]
-
-        buttons_if_logged_in(message, loan)
+            buttons_if_logged_in(message, loan)
+    except Exception:
+        loan.send_message(message.chat.id, "Что-то пошло не так, попробуйте ещё раз", reply_to_message_id=message.id,
+                          reply_markup=buttons_back())
 
 
 def change_event(message, loan):

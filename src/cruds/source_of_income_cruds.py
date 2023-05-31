@@ -79,7 +79,7 @@ class SourceOfIncomeCruds:
         ).join(EarningsModel.agent_id)
                 .join(EarningsModel.source_id)
                 .filter(LoanAdminsModel.admin_username == username)
-                .filter(EarningsModel.time_created < interval_end)
+                .filter(EarningsModel.time_created <= interval_end)
                 .group_by('year', 'month', EarningsModel.currency)
                 .all())
 

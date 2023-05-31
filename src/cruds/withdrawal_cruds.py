@@ -1,4 +1,5 @@
 import uuid
+from datetime import timedelta
 
 from create_engine import session
 from models.admins import LoanAdminsModel
@@ -20,7 +21,7 @@ class WithdrawalCruds:
     def get_all_by_agent_id_and_time(agent: LoanAdminsModel, date_to_check) -> WithdrawModel:
         if date_to_check:
             interval_start = date_to_check[0].strftime("%Y-%m-%d")
-            interval_end = date_to_check[1].strftime("%Y-%m-%d")
+            interval_end = (date_to_check[1] + timedelta(days=1)).strftime("%Y-%m-%d")
 
             return (
                 session.query(WithdrawModel)

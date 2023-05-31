@@ -50,7 +50,7 @@ def get_agents_balance(message, loan, agent_username):
     complex_history = generate_string_for_graded_month(history_first_part.strip(), history_second_part.strip(),
                                                        for_main_agent=True)
 
-    message_of_agent = create_message(balance, complex_history.strip())
+    message_of_agent = agent_username+'\n\n'+create_message(balance, complex_history.strip())
 
     buttons_agent_history(message, loan, message_of_agent)
 
