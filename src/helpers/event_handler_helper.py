@@ -1,3 +1,4 @@
+import calendar
 from typing import Dict
 
 from buttons.buttons_back import buttons_back
@@ -13,15 +14,17 @@ from commands_handler.expense_data_handler import expense_data_handler
 from commands_handler.show_balance_handler import get_agent_balance
 from cruds.agent_cruds import agent_cruds
 from cruds.source_of_income_cruds import source_of_income_cruds
+from helpers.date.date import get_current_month, get_prev_month
 from helpers.enums.helper_main_agent_enum import HelperMainAgentEnum
 from helpers.enums.inline_buttons_enum import InlineButtonsEnum
 from helpers.enums.inline_buttons_helper_enum import InlineButtonsHelperEnum
 from helpers.income_and_profit.profit_other_date_calculator import get_profit_of_other_dates
 from helpers.withdrawal_helper import withdrawal_helper, create_withdrawn_for_main_agent
 
+month, year = get_current_month()
 agent_set_income_source: Dict = {}
 has_expense: Dict = {}
-limit_dict: Dict = {}
+current_month_year: Dict = {'month': month, 'year': year}
 main_agent_get_info_about: Dict = {}
 
 
@@ -106,21 +109,28 @@ def event_other_buttons_helper(call, agent, loan):
 def main_agent_command_helper(call, loan, agent):
     all_agents = [agent.admin_username for agent in agent_cruds.get_all_agents()]
     if call.data in all_agents:
+        mnth, _ = get_current_month()
+        current_month_year['month'] = mnth
         buttons_main_agents_commands(call.message, loan)
         main_agent_get_info_about[agent.admin_username] = call.data
 
     elif call.data == HelperMainAgentEnum.MAIN_AGENT_HISTORY:
-        limit_dict['limit'] = 0
+        mnth, _ = get_current_month()
+
+        current_month_year['month'] = mnth
         get_agents_balance(message=call.message,
                            loan=loan,
                            agent_username=main_agent_get_info_about[agent.admin_username])
     elif call.data == HelperMainAgentEnum.MAIN_AGENT_WITHDRAW:
+        mnth, _ = get_current_month()
+
+        current_month_year['month'] = mnth
         create_withdrawn_for_main_agent(call.message, loan,
                                         agent_username=main_agent_get_info_about[agent.admin_username])
     elif call.data == HelperMainAgentEnum.MORE_HISTORY:
-        limit_dict['limit'] += int(HelperMainAgentEnum.LIMIT)
+        prev_month = get_prev_month(current_month_year['month'])
+        current_month_year['month'] = calendar.month_name[prev_month]
         get_more_history(message=call.message,
                          loan=loan,
                          agent_username=main_agent_get_info_about[agent.admin_username],
-                         start=limit_dict.get('limit') - int(HelperMainAgentEnum.LIMIT),
-                         end=limit_dict.get('limit'))
+                         current_month_year=current_month_year)

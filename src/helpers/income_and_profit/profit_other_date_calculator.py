@@ -1,13 +1,12 @@
 import calendar
 
-from datetime import datetime, timedelta, date
+from datetime import date
 
 from cruds.source_of_income_cruds import source_of_income_cruds
 from cruds.withdrawal_cruds import withdraw_cruds
 from helpers.apis.get_currency_api import get_actual_currency
 from helpers.enums.currency_enum import CurrencyEnum
-from helpers.income_and_profit.profit_last_two_weeks_calculator import generate_profit_table, \
-    create_proportional_parts_of_month
+from helpers.income_and_profit.profit_last_two_weeks_calculator import generate_profit_table
 from models.admins import LoanAdminsModel
 
 

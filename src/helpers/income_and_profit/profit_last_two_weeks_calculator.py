@@ -1,3 +1,4 @@
+import calendar
 import re
 from datetime import datetime
 from typing import List
@@ -5,6 +6,7 @@ from typing import List
 from cruds.source_of_income_cruds import source_of_income_cruds
 from cruds.withdrawal_cruds import withdraw_cruds
 from helpers.apis.get_currency_api import get_actual_currency
+from helpers.date.date import get_prev_month
 from helpers.enums.currency_enum import CurrencyEnum
 from helpers.enums.inline_buttons_helper_enum import InlineButtonsHelperEnum
 from helpers.helper_functions import regex_escaper, create_profit_template
@@ -132,14 +134,16 @@ def get_withdrawal_summa(withdrawal):
     return sum([int(withdraw.summa) for withdraw in withdrawal])
 
 
-def create_proportional_parts_of_month():
+def create_proportional_parts_of_month(month=None):
     from datetime import date, timedelta
+    if not month:
+        today = date.today()
+        current_month = today.month
+        current_year = today.year
+    else:
+        current_month = list(calendar.month_name).index(month.get('month').capitalize()) + 1
+        current_year = month.get('year')
 
-    today = date.today()
-    current_month = today.month
-    current_year = today.year
-
-    # Get the number of days in the current month
     days_in_month = date(current_year, current_month + 1, 1) - date(current_year, current_month, 1)
     # Calculate the start and end dates of the two proportional parts
     interval_start_first = date(current_year, current_month, 1)
@@ -151,8 +155,8 @@ def create_proportional_parts_of_month():
     return [interval_start_first, interval_end_first], [interval_start_second, interval_end_second]
 
 
-def generate_string_for_graded_month(first_part, second_part, for_main_agent=False):
-    part_1, part_2 = create_proportional_parts_of_month()
+def generate_string_for_graded_month(first_part, second_part, for_main_agent=False, months=None):
+    part_1, part_2 = create_proportional_parts_of_month(month=months)
     first_part_string = second_part_string = ''
     if 'пока нет' not in first_part and first_part:
         first_part_string = f'``` {part_1[0].strftime("%d %B")}\\-{part_1[1].strftime("%d %B")}``` \n\n' \
