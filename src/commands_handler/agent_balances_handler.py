@@ -10,6 +10,11 @@ from helpers.income_and_profit.profit_last_two_weeks_calculator import create_pr
 from helpers.income_and_profit.profit_other_date_calculator import get_profit_of_other_dates
 from helpers.inform_message_creator.create_balance_message import create_balance_message
 
+agent_username_mapper = {
+    'skv_katya': '***Катя***',
+    'Klepikovevgenij': '***Евгений***'
+}
+
 
 def handler_agent_balances(message, loan, agent):
     """
@@ -50,7 +55,8 @@ def get_agents_balance(message, loan, agent_username):
     complex_history = generate_string_for_graded_month(history_first_part.strip(), history_second_part.strip(),
                                                        for_main_agent=True)
 
-    message_of_agent = agent_username+'\n\n'+create_message(balance, complex_history.strip())
+    message_of_agent = agent_username_mapper.get(agent_username) + '\n\n' + create_message(balance,
+                                                                                           complex_history.strip())
 
     buttons_agent_history(message, loan, message_of_agent)
 

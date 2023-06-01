@@ -27,15 +27,18 @@ def create_balance_message(earnings, include_history=True):
 
 
 def dollar_calculator(earnings: List[EarningsModel]):
-    return str(sum([float(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.DOLLAR])).replace('.', ',')
+    return str(round(sum([float(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.DOLLAR]), 2)).replace(
+        '.', ',')
 
 
 def eur_calculator(earnings: List[EarningsModel]):
-    return str(sum([float(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.EURO])).replace('.', ',')
+    return str(round(sum([float(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.EURO]), 6)).replace(
+        '.', ',')
 
 
 def uah_calculator(earnings: List[EarningsModel]):
-    return str(sum([float(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.UAH])).replace('.', ',')
+    return str(round(sum([float(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.UAH]), 2)).replace(
+        '.', ',')
 
 
 def create_balance(earnings) -> Dict:
