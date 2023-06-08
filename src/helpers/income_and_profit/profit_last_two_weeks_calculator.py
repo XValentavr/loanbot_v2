@@ -6,7 +6,6 @@ from typing import List
 from cruds.source_of_income_cruds import source_of_income_cruds
 from cruds.withdrawal_cruds import withdraw_cruds
 from helpers.apis.get_currency_api import get_actual_currency
-from helpers.date.date import get_prev_month
 from helpers.enums.currency_enum import CurrencyEnum
 from helpers.enums.inline_buttons_helper_enum import InlineButtonsHelperEnum
 from helpers.helper_functions import regex_escaper, create_profit_template

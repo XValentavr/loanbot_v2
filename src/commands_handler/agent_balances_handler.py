@@ -13,7 +13,8 @@ from helpers.inform_message_creator.create_balance_message import create_balance
 
 agent_username_mapper = {
     'skv_katya': '***Катя***',
-    'Klepikovevgenij': '***Евгений***'
+    'Klepikovevgenij': '***Евгений***',
+    'Valentavr': '1122'
 }
 
 
