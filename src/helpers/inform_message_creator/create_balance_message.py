@@ -1,13 +1,17 @@
 import re
 from typing import List, Dict
 
+from cruds.agent_cruds import agent_cruds
+from cruds.withdrawal_cruds import withdraw_cruds
 from helpers.enums.currency_enum import CurrencyEnum
 from helpers.helper_functions import regex_escaper
 from models.earning_model import EarningsModel
 from prettytable import PrettyTable
 
+from models.withdraw_model import WithdrawModel
 
-def create_balance_message(earnings, include_history=True):
+
+def create_balance_message(agent_username, earnings, include_history=True):
     """
     Create pretty table to chat
     :param earnings: current agent earnings
@@ -15,8 +19,11 @@ def create_balance_message(earnings, include_history=True):
     :return: changed string
     """
     table = PrettyTable(['Валюта', 'Баланс'])
-    balances = create_balance(earnings)
-    history = create_balance_history(earnings)
+    agent = agent_cruds.get_by_username(agent_username)
+    withdraw = withdraw_cruds.get_all_by_agent_id_and_time(agent, date_to_check=None)
+
+    balances = create_balance(earnings, withdraw=withdraw)
+    history = create_balance_history(earnings, withdraw=withdraw)
     if balances or history:
         for currency, balance in balances.items():
             table.add_row([currency, balance])
@@ -27,8 +34,7 @@ def create_balance_message(earnings, include_history=True):
 
 
 def dollar_calculator(earnings: List[EarningsModel]):
-    return str(round(sum([float(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.DOLLAR]), 2)).replace(
-        '.', ',')
+    return round(sum([float(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.DOLLAR]), 2)
 
 
 def eur_calculator(earnings: List[EarningsModel]):
@@ -41,10 +47,11 @@ def uah_calculator(earnings: List[EarningsModel]):
         '.', ',')
 
 
-def create_balance(earnings) -> Dict:
+def create_balance(earnings, withdraw: List = [0.0]) -> Dict:
     """
     Create dict of currency and balance
     :param earnings: agent earnings
+    :param withdraw: withdraw summa
     :return: dict of currency and balance
     """
     balance = {}
@@ -52,8 +59,7 @@ def create_balance(earnings) -> Dict:
     dollar = dollar_calculator(earnings)
     eur = eur_calculator(earnings)
     uah = uah_calculator(earnings)
-
-    balance['USD'] = dollar
+    balance['USD'] = str(float(dollar) - float(sum([float(w.summa) for w in withdraw]))).replace('.', ',')
 
     balance['EUR'] = eur
 
@@ -62,8 +68,18 @@ def create_balance(earnings) -> Dict:
     return balance
 
 
-def create_balance_history(profits: List[EarningsModel]):
+def create_balance_history(profits: List[EarningsModel], withdraw: List[WithdrawModel]):
+    from helpers.income_and_profit.profit_last_two_weeks_calculator import date_changer
     history = []
+
+    if withdraw:
+        history.append('***Выведено***\n')
+        for w in withdraw:
+            history.append(
+                f'{date_changer(str(w.time_created))}: запрошено на вывод {round(int(w.summa), 2)}$')
+        history.append('\n')
+    history.append('***История***\n')
+
     for number, profit in enumerate(profits):
         history.append(history_template(profit, number))
 

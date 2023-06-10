@@ -13,4 +13,4 @@ def get_agent_balance(message, loan, agent: LoanAdminsModel):
     """
     earnings = earnings_cruds.get_earning_by_agent_id(agent.id)
 
-    loan.send_message(chat_id=message.chat.id, text=create_balance_message(earnings), parse_mode='MarkdownV2')
+    loan.send_message(chat_id=message.chat.id, text=create_balance_message(agent.admin_username, earnings), parse_mode='MarkdownV2')

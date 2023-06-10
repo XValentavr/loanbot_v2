@@ -18,15 +18,16 @@ def get_profit_of_last_two_weeks(agent: LoanAdminsModel, for_withdrawal=False):
 
     profit_for_first_part = source_of_income_cruds.get_source_percent_and_summa_by_username_last_two_weeks(
         agent.admin_username, first_part)
-    withdrawal_first = withdraw_cruds.get_all_by_agent_id_and_time(agent=agent, date_to_check=first_part)
-
+    # withdrawal_first = withdraw_cruds.get_all_by_agent_id_and_time(agent=agent, date_to_check=first_part)
+    withdrawal_first = None
     first_month_part_result = generate_profit_table(profit_for_first_part, withdrawal_first, for_withdrawal)
 
     # get for second part of a month
     profit_for_second_part = source_of_income_cruds.get_source_percent_and_summa_by_username_last_two_weeks(
         agent.admin_username, second_part)
 
-    withdrawal_second = withdraw_cruds.get_all_by_agent_id_and_time(agent=agent, date_to_check=second_part)
+    # withdrawal_second = withdraw_cruds.get_all_by_agent_id_and_time(agent=agent, date_to_check=second_part)
+    withdrawal_second = None
 
     second_month_part_result = generate_profit_table(profit_for_second_part, withdrawal_second, for_withdrawal)
 

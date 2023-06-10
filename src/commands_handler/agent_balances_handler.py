@@ -51,7 +51,8 @@ def get_agents_balance(message, loan, agent_username, current_month_year=None):
 
     earnings = earnings_cruds.get_earning_by_agent_id(agent_to_check.id)
 
-    balance = create_balance_message(earnings, include_history=False)
+    balance = create_balance_message(agent_username, earnings, include_history=False)
+
     profits_first_part = get_profit_of_other_dates(agent_to_check, calculate_date=False, partial=first_part)
     history_first_part = profits_first_part + '\n\n' + '\n'.join(
         create_incomes_story(get_history(agent_to_check, date_to_check=first_part))) + '\n\n'

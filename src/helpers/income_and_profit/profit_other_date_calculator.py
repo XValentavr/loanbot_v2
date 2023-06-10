@@ -19,11 +19,11 @@ def get_profit_of_other_dates(agent: LoanAdminsModel, calculate_date=True, parti
                                                                                                 first_day_of_current_month)
         return create_table_for_other_profits(all_profit)
     else:
-        withdrawal = withdraw_cruds.get_all_by_agent_id_and_time(agent=agent, date_to_check=partial)
+        # withdrawal = withdraw_cruds.get_all_by_agent_id_and_time(agent=agent, date_to_check=partial)
         profit = source_of_income_cruds.get_source_percent_and_summa_by_username_last_two_weeks(
             agent.admin_username, partial)
         return generate_profit_table(profit, is_for_main_agent=True, for_withdrawal=False,
-                                     withdrawal=withdrawal)
+                                     withdrawal=None)
 
 
 def create_table_for_other_profits(profits):
