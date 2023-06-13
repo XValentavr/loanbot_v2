@@ -8,6 +8,7 @@ from cruds.source_of_income_cruds import source_of_income_cruds
 from cruds.withdrawal_cruds import withdraw_cruds
 from helpers.helper_functions import remove_all_chars, regex_escaper
 from helpers.income_and_profit.profit_last_two_weeks_calculator import generate_profit_table
+from send_to_owner.send_message_to_owner import send_message_to_owner
 
 
 def withdrawal_helper(message, loan, agent):
@@ -27,6 +28,7 @@ def withdrawal_next_step(message, loan, agent):
     summa = remove_all_chars(message.text)
     if summa and float(summa) % 100 == 0:
         withdraw_cruds.insert_agent(summa, agent)
+        send_message_to_owner(loan=loan, admin=agent.admin_username, instance=None, withdraw=summa)
 
         buttons_if_logged_in(message, loan)
     else:

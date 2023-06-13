@@ -10,5 +10,12 @@ def generate_message_for_owner(instance: EarningsModel, admin: str):
     return f'{admin} внес расход {instance.summa}{instance.currency}\n{instance.comment}'.replace('\\', '')
 
 
-def send_message_to_owner(loan, instance: EarningsModel, admin: str):
-    loan.send_message(Creds.OWNER_USER_ID, generate_message_for_owner(instance, admin))
+def generate_withdraw_message_for_owner(summa: str, admin: str):
+    return f'{admin} запросил вывод {summa}$'.replace('\\', '')
+
+
+def send_message_to_owner(loan, instance: EarningsModel, admin: str, withdraw=None):
+    if withdraw:
+        loan.send_message(Creds.OWNER_USER_ID, generate_withdraw_message_for_owner(withdraw, admin))
+    else:
+        loan.send_message(Creds.OWNER_USER_ID, generate_message_for_owner(instance, admin))
