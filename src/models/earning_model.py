@@ -13,6 +13,7 @@ class EarningsModel(BaseModel):
     currency = Column(String(25), nullable=True)
     comment = Column(String(255), nullable=True)
     agent_id = relationship(LoanAdminsModel, backref="earnings_model")
+    admin_char = Column(String(25), nullable=True)
 
     agent_source_id = Column(
         String(100),

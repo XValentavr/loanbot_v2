@@ -4,10 +4,11 @@ from buttons.buttons_agents_balances import buttons_all_agents, buttons_agent_hi
 from buttons.buttons_back import buttons_back
 from cruds.agent_cruds import agent_cruds
 from cruds.earning_cruds import earnings_cruds
+from cruds.withdrawal_cruds import withdraw_cruds
 from helpers.enums.helper_main_agent_enum import HelperMainAgentEnum
 from helpers.helper_functions import regex_escaper
 from helpers.income_and_profit.profit_last_two_weeks_calculator import create_profit_string, include_withdrawal, \
-    create_proportional_parts_of_month, generate_string_for_graded_month
+    create_proportional_parts_of_month, generate_string_for_graded_month, date_changer
 from helpers.income_and_profit.profit_other_date_calculator import get_profit_of_other_dates
 from helpers.inform_message_creator.create_balance_message import create_balance_message
 
@@ -49,6 +50,9 @@ def get_agents_balance(message, loan, agent_username, current_month_year=None):
 
     agent_to_check = agent_cruds.get_by_username(agent_username)
 
+    withdraw = withdraw_cruds.get_all_by_agent_id_and_time(agent=agent_to_check, date_to_check=None,
+                                                           current_month=first_part[0].strftime("%B") or current_month)
+
     earnings = earnings_cruds.get_earning_by_agent_id(agent_to_check.id)
 
     balance = create_balance_message(agent_username, earnings, include_history=False)
@@ -65,8 +69,9 @@ def get_agents_balance(message, loan, agent_username, current_month_year=None):
                                                        for_main_agent=True, months=current_month_year)
     message_of_agent = agent_username_mapper.get(agent_username) + '\n\n' + create_message(balance,
                                                                                            complex_history.strip())
+
     if is_current_month or ('пока нет' not in history_first_part or 'пока нет' not in history_second_part):
-        buttons_agent_history(message, loan, message_of_agent)
+        buttons_agent_history(message, loan, message_of_agent + create_withdraw_string(withdraw))
     else:
         loan.send_message(message.chat.id, "Больше ничего не найдено", reply_markup=buttons_back())
 
@@ -115,3 +120,14 @@ def create_incomes_story(earnings):
 
 def get_withdrawal_string(withdrawal):
     return [f'***{regex_escaper(include_withdrawal(withdraw))}***' for withdraw in withdrawal]
+
+
+def create_withdraw_string(withdraw):
+    wtdrw = []
+    if withdraw:
+        wtdrw.append('\n\n***Запрошено на вывод***\n')
+        for w in withdraw:
+            wtdrw.append(
+                f'{date_changer(str(w.time_created))}: запрошено на вывод {round(int(w.summa), 2)}$')
+
+    return '\n'.join(wtdrw)

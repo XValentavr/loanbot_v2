@@ -60,7 +60,8 @@ def generate_withdrawal_for_main_agent_or_not(base_profit, all_withdraw, for_mai
         final_sum = round(
             float(re.sub(r'\\', '', base_profit)) - float(sum([int(withdraw.summa) for withdraw in all_withdraw])), 2)
         if for_main:
-            return f'***Общая сумма дохода: {base_profit}$***\n\nЗапрошено на вывод:\n{summa}\n\nДолг: {regex_escaper(str(final_sum))}$'
+            dolg_string = f"Тебе должны: {regex_escaper(str(int(final_sum)))} " if int(final_sum) < 0 else f"Ты должен: {regex_escaper(str(int(final_sum)))}"
+            return f'***Общая сумма дохода: {base_profit}$***\n\nЗапрошено на вывод:\n{summa}\n\n{dolg_string}$'
         return f'***Общая сумма дохода: {base_profit}$***\n\nЗапрошено на вывод:\n{summa}\n\nДоступно: {regex_escaper(str(final_sum))}$'
 
     return 'Транзакций пока не найдено'

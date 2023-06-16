@@ -2,9 +2,10 @@ import uuid
 from datetime import timedelta
 from typing import Optional
 
-from sqlalchemy import asc
+from sqlalchemy import asc, desc
 
 from create_engine import session
+from cruds.agent_cruds import agent_cruds
 from cruds.source_of_income_cruds import source_of_income_cruds
 from models.earning_model import EarningsModel
 
@@ -20,6 +21,7 @@ class EarningsCruds:
         source = EarningsModel(summa=summa,
                                comment=comment,
                                agent_source_id=agent_id,
+                               admin_char=agent_cruds.get_by_id(agent_id).admin_username,
                                income_source_id=source_id,
                                currency=currency,
                                is_other_source=is_other_source,
@@ -35,7 +37,7 @@ class EarningsCruds:
     def get_earning_by_agent_id(agent_id: uuid.UUID) -> EarningsModel:
         return (
             session.query(EarningsModel)
-            .order_by(asc(EarningsModel.time_created))
+            .order_by(desc(EarningsModel.time_created))
             .filter(EarningsModel.agent_source_id == agent_id)
             .all()
         )

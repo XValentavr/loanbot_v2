@@ -17,4 +17,5 @@ class WithdrawModel(BaseModel):
         nullable=True,
         unique=False,
     )
+    admin_char = Column(String(25), nullable=True)
     time_created = Column(DateTime(timezone=True), server_default=func.now())

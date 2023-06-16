@@ -42,5 +42,13 @@ class AgentCruds:
             .first()
         )
 
+    @staticmethod
+    def get_by_id(id: str) -> LoanAdminsModel:
+        return (
+            session.query(LoanAdminsModel)
+            .filter(LoanAdminsModel.id == id)
+            .first()
+        )
+
 
 agent_cruds = AgentCruds()
