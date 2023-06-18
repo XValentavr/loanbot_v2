@@ -52,8 +52,7 @@ def generate_profit_table(profits: List[EarningsModel],
             if profit.source_id.source != InlineButtonsHelperEnum.OTHER:
                 table.append(regex_escaper(create_profit_string(profit)).replace('=', '\\='))
                 earned.append(get_all_summa_of_profit(profit, uah, eur))
-
-        if eur and uah and earned:
+        if eur and uah and (earned or is_for_main_agent):
             if withdrawal:
                 withdrawal_to_string = [f'***{regex_escaper(include_withdrawal(withdraw))}***' for withdraw in
                                         withdrawal]

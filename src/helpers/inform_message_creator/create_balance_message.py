@@ -38,7 +38,7 @@ def dollar_calculator(earnings: List[EarningsModel]):
 
 
 def eur_calculator(earnings: List[EarningsModel]):
-    return str(round(sum([float(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.EURO]), 6)).replace(
+    return str(round(sum([float(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.EURO]), 2)).replace(
         '.', ',')
 
 

@@ -38,7 +38,7 @@ def create_table_for_other_profits(profits):
         pretty_string = ''
         if profits_by_month_list:
             for combines in combine_by_month(profits_by_month_list):
-                pretty_string = pretty_string + f'```{combines.get("month")}```\n```{round(combines.get("summa"),2)}{CurrencyEnum.DOLLAR}```'
+                pretty_string = pretty_string + f'```{combines.get("month")}```\n```{round(combines.get("summa"), 2)}{CurrencyEnum.DOLLAR}```'
             return pretty_string
 
         return "Произошла ошибка, попробуйте ещё раз"
