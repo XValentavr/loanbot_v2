@@ -2,7 +2,7 @@ import re
 
 from buttons.buttons_back import buttons_back
 from buttons.buttons_if_logged_in import buttons_if_logged_in
-from commands_handler.agent_balances_handler import get_withdrawal_string
+from commands_handler.agent_balances_handler import get_withdrawal_string, agent_username_mapper
 from cruds.agent_cruds import agent_cruds
 from cruds.source_of_income_cruds import source_of_income_cruds
 from cruds.withdrawal_cruds import withdraw_cruds
@@ -26,7 +26,7 @@ def withdrawal_helper(message, loan, agent):
 
 def withdrawal_next_step(message, loan, agent):
     summa = remove_all_chars(message.text)
-    if summa and float(summa) % 100 == 0:
+    if summa and float(summa) >= 0.0:
         withdraw_cruds.insert_agent(summa, agent)
         send_message_to_owner(loan=loan, admin=agent.admin_username, instance=None, withdraw=summa)
 
@@ -46,7 +46,8 @@ def create_withdrawn_for_main_agent(message, loan, agent_username, for_main=True
     base_profit = generate_profit_table(profit, all_withdraw, for_withdrawal=True, for_main_agent_withdrawal=True)
     if for_main:
         loan.send_message(message.chat.id,
-                          generate_withdrawal_for_main_agent_or_not(base_profit, all_withdraw, for_main),
+                          generate_withdrawal_for_main_agent_or_not(base_profit, all_withdraw, for_main,
+                                                                    agent_username=agent_username),
                           reply_to_message_id=message.id,
                           parse_mode='MarkdownV2',
                           reply_markup=buttons_back())
@@ -54,14 +55,14 @@ def create_withdrawn_for_main_agent(message, loan, agent_username, for_main=True
         return generate_withdrawal_for_main_agent_or_not(base_profit, all_withdraw, for_main)
 
 
-def generate_withdrawal_for_main_agent_or_not(base_profit, all_withdraw, for_main):
+def generate_withdrawal_for_main_agent_or_not(base_profit, all_withdraw, for_main, agent_username=None):
     if base_profit and all_withdraw:
         summa = "\n".join(get_withdrawal_string(all_withdraw))
         final_sum = round(
             float(re.sub(r'\\', '', base_profit)) - float(sum([int(withdraw.summa) for withdraw in all_withdraw])), 2)
         if for_main:
-            debt_string_main = f"Тебе должны: {regex_escaper(str(float(final_sum)))} " if float(
-                final_sum) <= 0 else f"Ты должен: {regex_escaper(str(float(final_sum)))}"
+            debt_string_main = f"{agent_username_mapper.get(agent_username)} тебе должен: {regex_escaper(str(float(final_sum)))} " if float(
+                final_sum) <= 0 else f"Ты должен {agent_username_mapper.get(agent_username)}: {regex_escaper(str(float(final_sum)))}"
             return f'***Общая сумма дохода: {base_profit}$***\n\nЗапрошено на вывод:\n{summa}\n\n{debt_string_main}$'
         debt_string_not_main = f"Ты должен: {regex_escaper(str(float(final_sum)))} " if float(
             final_sum) <= 0 else f"Тебе должны: {regex_escaper(str(float(final_sum)))}"
