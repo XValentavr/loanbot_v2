@@ -5,6 +5,7 @@ from buttons.buttons_if_logged_in import buttons_if_logged_in
 from buttons.buttons_insert_data import buttons_insert_data
 from buttons.buttons_my_prev_incomes import buttons_get_previous_incomes
 from commands_handler.agent_balances_handler import handler_agent_balances
+from commands_handler.agent_xlsx import send_xlsx_file
 from commands_handler.show_balance_handler import get_agent_balance
 from create_engine import session
 from cruds.agent_cruds import agent_cruds
@@ -52,6 +53,16 @@ def my_income(message):
     agent = agent_cruds.get_by_username(username=message.from_user.username)
     if agent.admin_username in HelperMainAgentEnum.MAIN_ADMIN_USERNAME:
         handler_agent_balances(message, loan, agent)
+    else:
+        loan.send_message(message.chat.id, "У вас нет доступа к этой команде!")
+
+
+@loan.message_handler(commands=["sheet"])
+@login_required
+def sheet_sending(message):
+    agent = agent_cruds.get_by_username(username=message.from_user.username)
+    if agent.admin_username in HelperMainAgentEnum.MAIN_ADMIN_USERNAME:
+        send_xlsx_file(loan, message)
     else:
         loan.send_message(message.chat.id, "У вас нет доступа к этой команде!")
 

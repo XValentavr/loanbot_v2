@@ -81,5 +81,17 @@ class WithdrawalCruds:
         last_day_plus_one_str = last_day_plus_one.strftime('%Y-%m-%d')
         return first_day_str, last_day_plus_one_str
 
+    @staticmethod
+    def get_all_for_xlsx():
+
+        query = session.query(
+            WithdrawModel.summa,
+            LoanAdminsModel.admin_username,
+            WithdrawModel.time_created
+        ).join(
+            LoanAdminsModel, LoanAdminsModel.id == WithdrawModel.agent_source_id
+        )
+        return query.all()
+
 
 withdraw_cruds = WithdrawalCruds()

@@ -7,7 +7,9 @@ from sqlalchemy import asc, desc
 from create_engine import session
 from cruds.agent_cruds import agent_cruds
 from cruds.source_of_income_cruds import source_of_income_cruds
+from models.admins import LoanAdminsModel
 from models.earning_model import EarningsModel
+from models.sources_of_income_model import SourcesOfIncomeModel
 
 
 class EarningsCruds:
@@ -63,6 +65,23 @@ class EarningsCruds:
             .all()
         )
         return earnings[start:end]
+
+    @staticmethod
+    def get_all_for_xlsx():
+        query = session.query(
+            EarningsModel.summa,
+            EarningsModel.comment,
+            EarningsModel.currency,
+            EarningsModel.source_name,
+            LoanAdminsModel.admin_username,
+            EarningsModel.time_created
+        ).join(
+            LoanAdminsModel, LoanAdminsModel.id == EarningsModel.agent_source_id
+        ).join(
+            SourcesOfIncomeModel, SourcesOfIncomeModel.id == EarningsModel.income_source_id
+        )
+
+        return query.all()
 
 
 earnings_cruds = EarningsCruds()
