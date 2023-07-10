@@ -85,9 +85,9 @@ class WithdrawalCruds:
     def get_all_for_xlsx():
 
         query = session.query(
+            WithdrawModel.time_created,
             WithdrawModel.summa,
             LoanAdminsModel.admin_username,
-            WithdrawModel.time_created
         ).join(
             LoanAdminsModel, LoanAdminsModel.id == WithdrawModel.agent_source_id
         )

@@ -69,12 +69,12 @@ class EarningsCruds:
     @staticmethod
     def get_all_for_xlsx():
         query = session.query(
+            EarningsModel.time_created,
             EarningsModel.summa,
             EarningsModel.comment,
             EarningsModel.currency,
             EarningsModel.source_name,
             LoanAdminsModel.admin_username,
-            EarningsModel.time_created
         ).join(
             LoanAdminsModel, LoanAdminsModel.id == EarningsModel.agent_source_id
         ).join(
