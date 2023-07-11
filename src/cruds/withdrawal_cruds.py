@@ -1,7 +1,7 @@
 import uuid
 from datetime import timedelta
 
-from sqlalchemy import asc
+from sqlalchemy import asc, desc
 
 from create_engine import session
 from models.admins import LoanAdminsModel
@@ -90,7 +90,8 @@ class WithdrawalCruds:
             LoanAdminsModel.admin_username,
         ).join(
             LoanAdminsModel, LoanAdminsModel.id == WithdrawModel.agent_source_id
-        )
+        ).order_by(desc(WithdrawModel.time_created))
+
         return query.all()
 
 

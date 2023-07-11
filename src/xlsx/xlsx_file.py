@@ -1,5 +1,5 @@
 import pandas as pd
-from openpyxl.styles import PatternFill, Font
+from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
 from openpyxl.workbook import Workbook
 from pandas import Timestamp
@@ -122,9 +122,9 @@ def _conditional_formatting(sheet, model, model_name: str = None):
     for row in sheet.iter_rows(min_row=2, max_row=len(model) + 1):
         summa_cell = row[earnings_columns.index('Summa')]
         if summa_cell.value < 0 or model_name == 'withdraw':
-            summa_cell.font = Font(color="F21F1F")  # Set text color to white for negative values
+            summa_cell.font = Font(color="C0504E")  # Set text color to white for negative values
         else:
-            summa_cell.font = Font(color="10EB4B")  # Set text color to black for positive values
+            summa_cell.font = Font(color="4F6328")  # Set text color to black for positive values
 
 
 def _wrap_text(sheet, columns):

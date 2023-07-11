@@ -79,7 +79,7 @@ class EarningsCruds:
             LoanAdminsModel, LoanAdminsModel.id == EarningsModel.agent_source_id
         ).join(
             SourcesOfIncomeModel, SourcesOfIncomeModel.id == EarningsModel.income_source_id
-        )
+        ).order_by(desc(EarningsModel.time_created))
 
         return query.all()
 
