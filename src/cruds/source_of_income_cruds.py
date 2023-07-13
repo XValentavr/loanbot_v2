@@ -23,7 +23,7 @@ class SourceOfIncomeCruds:
     @staticmethod
     def get_all_sources() -> SourcesOfIncomeModel:
         return (
-            session.query(SourcesOfIncomeModel).all()
+            session.query(SourcesOfIncomeModel).filter(SourcesOfIncomeModel.is_active == True).all()
         )
 
     @staticmethod

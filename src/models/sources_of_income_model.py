@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy import Column, String, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 
 from models.admins import LoanAdminsModel
@@ -18,3 +18,5 @@ class SourcesOfIncomeModel(BaseModel):
         nullable=True,
         unique=False,
     )
+
+    is_active = Column(Boolean, default=True)
