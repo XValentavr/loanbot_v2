@@ -28,8 +28,7 @@ def extract_comment(message):
 
 
 def check_if_dollar(currency):
-    dollars = ["дол", "$", "$.", "долл", "дол.", "долл.", "долларов.", "доллар", "долар", "доларов", "долларов",
-               "доллар.", 'usdt', 'usd']
+    dollars = ["дол", "$", "$.", "долл", "дол.", "долл.", "долларов.", "доллар", "долар", "доларов", "долларов", "доллар.", 'usdt', 'usd']
 
     pattern = '|'.join([re.escape(d) for d in dollars])
     if bool(re.search(pattern, currency.lower())):
@@ -56,7 +55,6 @@ def check_if_euro(currency):
         return CurrencyEnum.EURO
 
     return ErrorEnum.CURRENCY_NOT_FOUND
-
 
 
 def amount_checker(amount):

@@ -16,17 +16,11 @@ class AgentCruds:
 
     @staticmethod
     def get_all_agents():
-        return (
-            session.query(LoanAdminsModel).all()
-        )
+        return session.query(LoanAdminsModel).all()
 
     @staticmethod
     def get_agents_to_check_balance(agent):
-        return (
-            session.query(LoanAdminsModel)
-            .filter(LoanAdminsModel.admin_username != agent.admin_username)
-            .all()
-        )
+        return session.query(LoanAdminsModel).filter(LoanAdminsModel.admin_username != agent.admin_username).all()
 
     @staticmethod
     def update_agent_is_logged_in(agent: LoanAdminsModel):
@@ -36,19 +30,11 @@ class AgentCruds:
 
     @staticmethod
     def get_by_username(username: str) -> LoanAdminsModel:
-        return (
-            session.query(LoanAdminsModel)
-            .filter(LoanAdminsModel.admin_username == username)
-            .first()
-        )
+        return session.query(LoanAdminsModel).filter(LoanAdminsModel.admin_username == username).first()
 
     @staticmethod
     def get_by_id(id: str) -> LoanAdminsModel:
-        return (
-            session.query(LoanAdminsModel)
-            .filter(LoanAdminsModel.id == id)
-            .first()
-        )
+        return session.query(LoanAdminsModel).filter(LoanAdminsModel.id == id).first()
 
 
 agent_cruds = AgentCruds()

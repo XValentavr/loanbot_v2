@@ -22,25 +22,15 @@ class SourceOfIncomeCruds:
 
     @staticmethod
     def get_all_sources() -> SourcesOfIncomeModel:
-        return (
-            session.query(SourcesOfIncomeModel).filter(SourcesOfIncomeModel.is_active == True).all()
-        )
+        return session.query(SourcesOfIncomeModel).filter(SourcesOfIncomeModel.is_active == True).all()
 
     @staticmethod
     def get_source_by_source_id(source_id: uuid.UUID) -> SourcesOfIncomeModel:
-        return (
-            session.query(SourcesOfIncomeModel)
-            .filter(SourcesOfIncomeModel.id == source_id)
-            .first()
-        )
+        return session.query(SourcesOfIncomeModel).filter(SourcesOfIncomeModel.id == source_id).first()
 
     @staticmethod
     def get_source_by_source_name(source_name: str) -> SourcesOfIncomeModel:
-        return (
-            session.query(SourcesOfIncomeModel)
-            .filter(SourcesOfIncomeModel.source == source_name)
-            .first()
-        )
+        return session.query(SourcesOfIncomeModel).filter(SourcesOfIncomeModel.source == source_name).first()
 
     @staticmethod
     def get_source_percent_and_summa_by_username_last_two_weeks(username: str, date_to_check) -> Union[EarningsModel]:
@@ -71,17 +61,20 @@ class SourceOfIncomeCruds:
     @staticmethod
     def get_source_percent_and_summa_by_username_other_date(username: str, date_to_check) -> Union[EarningsModel]:
         interval_end = date_to_check.strftime("%Y-%m-%d")
-        return (session.query(
-            extract('month', EarningsModel.time_created).label('month'),
-            extract('year', EarningsModel.time_created).label('year'),
-            EarningsModel.currency,
-            func.sum(EarningsModel.summa).label('total')
-        ).join(EarningsModel.agent_id)
-                .join(EarningsModel.source_id)
-                .filter(LoanAdminsModel.admin_username == username)
-                .filter(EarningsModel.time_created <= interval_end)
-                .group_by('year', 'month', EarningsModel.currency)
-                .all())
+        return (
+            session.query(
+                extract('month', EarningsModel.time_created).label('month'),
+                extract('year', EarningsModel.time_created).label('year'),
+                EarningsModel.currency,
+                func.sum(EarningsModel.summa).label('total'),
+            )
+            .join(EarningsModel.agent_id)
+            .join(EarningsModel.source_id)
+            .filter(LoanAdminsModel.admin_username == username)
+            .filter(EarningsModel.time_created <= interval_end)
+            .group_by('year', 'month', EarningsModel.currency)
+            .all()
+        )
 
 
 source_of_income_cruds = SourceOfIncomeCruds()

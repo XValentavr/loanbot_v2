@@ -15,15 +15,14 @@ def get_profit_of_other_dates(agent: LoanAdminsModel, calculate_date=True, parti
         today = date.today()
         first_day_of_current_month = date(today.year, today.month, 1)
 
-        all_profit = source_of_income_cruds.get_source_percent_and_summa_by_username_other_date(agent.admin_username,
-                                                                                                first_day_of_current_month)
+        all_profit = source_of_income_cruds.get_source_percent_and_summa_by_username_other_date(
+            agent.admin_username, first_day_of_current_month
+        )
         return create_table_for_other_profits(all_profit)
     else:
         # withdrawal = withdraw_cruds.get_all_by_agent_id_and_time(agent=agent, date_to_check=partial)
-        profit = source_of_income_cruds.get_source_percent_and_summa_by_username_last_two_weeks(
-            agent.admin_username, partial)
-        return generate_profit_table(profit, is_for_main_agent=True, for_withdrawal=False,
-                                     withdrawal=None)
+        profit = source_of_income_cruds.get_source_percent_and_summa_by_username_last_two_weeks(agent.admin_username, partial)
+        return generate_profit_table(profit, is_for_main_agent=True, for_withdrawal=False, withdrawal=None)
 
 
 def create_table_for_other_profits(profits):
@@ -38,7 +37,9 @@ def create_table_for_other_profits(profits):
         pretty_string = ''
         if profits_by_month_list:
             for combines in combine_by_month(profits_by_month_list):
-                pretty_string = pretty_string + f'```{combines.get("month")}```\n```{round(combines.get("summa"), 2)}{CurrencyEnum.DOLLAR}```'
+                pretty_string = (
+                    pretty_string + f'```{combines.get("month")}```\n```{round(combines.get("summa"), 2)}{CurrencyEnum.DOLLAR}```'
+                )
             return pretty_string
 
         return "Произошла ошибка, попробуйте ещё раз"

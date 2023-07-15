@@ -25,7 +25,7 @@ def fill_source():
         'Турист': 5,
         'Ребёнок': 20,
         'Цыган': 5,
-        'Готель': 1
+        'Готель': 1,
     }
     for key in data.keys():
         source_of_income_cruds.insert_source(key, data[key])

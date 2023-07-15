@@ -38,13 +38,11 @@ def dollar_calculator(earnings: List[EarningsModel]):
 
 
 def eur_calculator(earnings: List[EarningsModel]):
-    return str(round(sum([float(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.EURO]), 2)).replace(
-        '.', ',')
+    return str(round(sum([float(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.EURO]), 2)).replace('.', ',')
 
 
 def uah_calculator(earnings: List[EarningsModel]):
-    return str(round(sum([float(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.UAH]), 2)).replace(
-        '.', ',')
+    return str(round(sum([float(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.UAH]), 2)).replace('.', ',')
 
 
 def create_balance(earnings, withdraw: List = [0.0]) -> Dict:
@@ -70,13 +68,13 @@ def create_balance(earnings, withdraw: List = [0.0]) -> Dict:
 
 def create_balance_history(profits: List[EarningsModel], withdraw: List[WithdrawModel]):
     from helpers.income_and_profit.profit_last_two_weeks_calculator import date_changer
+
     history = []
 
     if withdraw:
         history.append('***Выведено***\n')
         for w in withdraw:
-            history.append(
-                f'{date_changer(str(w.time_created))}: запрошено на вывод {round(int(w.summa), 2)}$')
+            history.append(f'{date_changer(str(w.time_created))}: запрошено на вывод {round(int(w.summa), 2)}$')
         history.append('\n')
     history.append('***История***\n')
 
@@ -88,6 +86,7 @@ def create_balance_history(profits: List[EarningsModel], withdraw: List[Withdraw
 
 def history_template(profit: EarningsModel, number):
     from helpers.income_and_profit.profit_last_two_weeks_calculator import date_changer
+
     return regex_escaper(f"{number + 1}. {date_changer(str(profit.time_created))}: ") + f"{escaper(profit)}"
 
 
@@ -99,8 +98,7 @@ def escaper(profit):
         if isinstance(checked, float):
             checked = str(checked).replace('.', ',')
         return f"***{regex_escaper(str(checked))}{profit.currency}*** {regex_escaper(comment)}"
-    return regex_escaper(
-        f"+{str(checked).replace('.', ',')}{profit.currency} от {profit.source_id.source}. {comment}")
+    return regex_escaper(f"+{str(checked).replace('.', ',')}{profit.currency} от {profit.source_id.source}. {comment}")
 
 
 def check_if_float(profit_summa):

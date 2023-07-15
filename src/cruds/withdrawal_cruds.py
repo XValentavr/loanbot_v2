@@ -43,10 +43,7 @@ class WithdrawalCruds:
                 .all()
             )
         return (
-            session.query(WithdrawModel)
-            .order_by(asc(WithdrawModel.time_created))
-            .filter(WithdrawModel.agent_source_id == agent.id)
-            .all()
+            session.query(WithdrawModel).order_by(asc(WithdrawModel.time_created)).filter(WithdrawModel.agent_source_id == agent.id).all()
         )
 
     @staticmethod
@@ -83,14 +80,15 @@ class WithdrawalCruds:
 
     @staticmethod
     def get_all_for_xlsx():
-
-        query = session.query(
-            WithdrawModel.time_created,
-            WithdrawModel.summa,
-            LoanAdminsModel.admin_username,
-        ).join(
-            LoanAdminsModel, LoanAdminsModel.id == WithdrawModel.agent_source_id
-        ).order_by(desc(WithdrawModel.time_created))
+        query = (
+            session.query(
+                WithdrawModel.time_created,
+                WithdrawModel.summa,
+                LoanAdminsModel.admin_username,
+            )
+            .join(LoanAdminsModel, LoanAdminsModel.id == WithdrawModel.agent_source_id)
+            .order_by(desc(WithdrawModel.time_created))
+        )
 
         return query.all()
 

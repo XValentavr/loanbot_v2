@@ -1,7 +1,6 @@
 import re
 
 
-
 def regex_escaper(string):
     return re.escape(string)
 
@@ -15,6 +14,7 @@ def create_profit_template(earned, withdrawal_summa, for_main_agent_withdrawal):
 
     if not for_main_agent_withdrawal:
         return f'***ОБЩАЯ СУММА ЗА ПЕРИОД {regex_escaper(str(round(float(escape_reserved_chars(str(sum(earned)))) - withdrawal_summa, 2)))}$***'.replace(
-            '.', ',')
+            '.', ','
+        )
     else:
         return regex_escaper(str(round(float(escape_reserved_chars(str(sum(earned)))), 2)))

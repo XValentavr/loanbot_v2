@@ -56,16 +56,16 @@ def ready_event(message, agent, loan, source, expense):
             loan.send_message(message.chat.id, ErrorEnum.CURRENCY_NOT_FOUND, reply_to_message_id=message.id)
             base_data_handler(message, loan)
         else:
-            earning = earnings_cruds.insert_source(summa=check_type_of_transaction_and_revert_amount(expense, amount),
-                                                   comment=text.split('верно?')[0].strip(),
-                                                   source_id=source.id if not other_source.get(
-                                                       agent.admin_username) and not expense else source_of_income_cruds.get_source_by_source_name(
-                                                       InlineButtonsHelperEnum.OTHER).id,
-                                                   agent_id=agent.id,
-                                                   currency=currency,
-                                                   is_other_source=other_source.get(
-                                                       agent.admin_username) if other_source.get(
-                                                       agent.admin_username) and not expense else None)
+            earning = earnings_cruds.insert_source(
+                summa=check_type_of_transaction_and_revert_amount(expense, amount),
+                comment=text.split('верно?')[0].strip(),
+                source_id=source.id
+                if not other_source.get(agent.admin_username) and not expense
+                else source_of_income_cruds.get_source_by_source_name(InlineButtonsHelperEnum.OTHER).id,
+                agent_id=agent.id,
+                currency=currency,
+                is_other_source=other_source.get(agent.admin_username) if other_source.get(agent.admin_username) and not expense else None,
+            )
 
             loan.send_message(message.chat.id, "Транзакция успешная!")
             send_message_to_owner(loan, earning, agent.admin_username)
@@ -74,8 +74,9 @@ def ready_event(message, agent, loan, source, expense):
 
             buttons_if_logged_in(message, loan)
     except Exception:
-        loan.send_message(message.chat.id, "Что-то пошло не так, попробуйте ещё раз", reply_to_message_id=message.id,
-                          reply_markup=buttons_back())
+        loan.send_message(
+            message.chat.id, "Что-то пошло не так, попробуйте ещё раз", reply_to_message_id=message.id, reply_markup=buttons_back()
+        )
 
 
 def change_event(message, loan):

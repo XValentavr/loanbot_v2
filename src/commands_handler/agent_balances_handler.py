@@ -7,16 +7,17 @@ from cruds.earning_cruds import earnings_cruds
 from cruds.withdrawal_cruds import withdraw_cruds
 from helpers.enums.helper_main_agent_enum import HelperMainAgentEnum
 from helpers.helper_functions import regex_escaper
-from helpers.income_and_profit.profit_last_two_weeks_calculator import create_profit_string, include_withdrawal, \
-    create_proportional_parts_of_month, generate_string_for_graded_month, date_changer
+from helpers.income_and_profit.profit_last_two_weeks_calculator import (
+    create_profit_string,
+    include_withdrawal,
+    create_proportional_parts_of_month,
+    generate_string_for_graded_month,
+    date_changer,
+)
 from helpers.income_and_profit.profit_other_date_calculator import get_profit_of_other_dates
 from helpers.inform_message_creator.create_balance_message import create_balance_message
 
-agent_username_mapper = {
-    'skv_katya': '***Катя***',
-    'Klepikovevgenij': '***Евгений***',
-    'Valentavr': '1122'
-}
+agent_username_mapper = {'skv_katya': '***Катя***', 'Klepikovevgenij': '***Евгений***', 'Valentavr': '1122'}
 
 
 def handler_agent_balances(message, loan, agent):
@@ -50,25 +51,28 @@ def get_agents_balance(message, loan, agent_username, current_month_year=None):
 
     agent_to_check = agent_cruds.get_by_username(agent_username)
 
-    withdraw = withdraw_cruds.get_all_by_agent_id_and_time(agent=agent_to_check, date_to_check=None,
-                                                           current_month=first_part[0].strftime("%B") or current_month)
+    withdraw = withdraw_cruds.get_all_by_agent_id_and_time(
+        agent=agent_to_check, date_to_check=None, current_month=first_part[0].strftime("%B") or current_month
+    )
 
     earnings = earnings_cruds.get_earning_by_agent_id(agent_to_check.id)
 
     balance = create_balance_message(agent_username, earnings, include_history=False)
 
     profits_first_part = get_profit_of_other_dates(agent_to_check, calculate_date=False, partial=first_part)
-    history_first_part = profits_first_part + '\n\n' + '\n'.join(
-        create_incomes_story(get_history(agent_to_check, date_to_check=first_part))) + '\n\n'
+    history_first_part = (
+        profits_first_part + '\n\n' + '\n'.join(create_incomes_story(get_history(agent_to_check, date_to_check=first_part))) + '\n\n'
+    )
 
     profits_second_part = get_profit_of_other_dates(agent_to_check, calculate_date=False, partial=second_part)
-    history_second_part = profits_second_part + '\n\n' + '\n'.join(
-        create_incomes_story(get_history(agent_to_check, date_to_check=second_part))) + '\n\n'
+    history_second_part = (
+        profits_second_part + '\n\n' + '\n'.join(create_incomes_story(get_history(agent_to_check, date_to_check=second_part))) + '\n\n'
+    )
 
-    complex_history = generate_string_for_graded_month(history_first_part.strip(), history_second_part.strip(),
-                                                       for_main_agent=True, months=current_month_year)
-    message_of_agent = agent_username_mapper.get(agent_username) + '\n\n' + create_message(balance,
-                                                                                           complex_history.strip())
+    complex_history = generate_string_for_graded_month(
+        history_first_part.strip(), history_second_part.strip(), for_main_agent=True, months=current_month_year
+    )
+    message_of_agent = agent_username_mapper.get(agent_username) + '\n\n' + create_message(balance, complex_history.strip())
 
     if is_current_month or ('пока нет' not in history_first_part or 'пока нет' not in history_second_part):
         buttons_agent_history(message, loan, message_of_agent + create_withdraw_string(withdraw))
@@ -98,7 +102,12 @@ def create_message(balance, history):
     return f'{balance}\n\n{history}'
 
 
-def get_history(agent, date_to_check, start=0, end=int(HelperMainAgentEnum.LIMIT), ):
+def get_history(
+    agent,
+    date_to_check,
+    start=0,
+    end=int(HelperMainAgentEnum.LIMIT),
+):
     """
     Get earnings history of transactions
     :param agent:
@@ -127,7 +136,6 @@ def create_withdraw_string(withdraw):
     if withdraw:
         wtdrw.append('\n\n***Запрошено на вывод***\n')
         for w in withdraw:
-            wtdrw.append(
-                f'{date_changer(str(w.time_created))}: запрошено на вывод {round(int(w.summa), 2)}$')
+            wtdrw.append(f'{date_changer(str(w.time_created))}: запрошено на вывод {round(int(w.summa), 2)}$')
 
     return '\n'.join(wtdrw)

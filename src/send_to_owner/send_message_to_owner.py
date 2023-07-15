@@ -6,7 +6,8 @@ def generate_message_for_owner(instance: EarningsModel, admin: str):
     summa = instance.summa
     if '-' not in summa:
         return f'{admin} внес доход {instance.summa}{instance.currency}\nКлиент - {instance.source_name}\n{instance.comment}'.replace(
-            '\\', '')
+            '\\', ''
+        )
     return f'{admin} внес расход {instance.summa}{instance.currency}\n{instance.comment}'.replace('\\', '')
 
 

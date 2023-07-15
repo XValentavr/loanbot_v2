@@ -2,32 +2,34 @@ import uuid
 from datetime import timedelta
 from typing import Optional
 
-from sqlalchemy import asc, desc
+from sqlalchemy import asc, desc, null, text
+from sqlalchemy import case, literal
 
 from create_engine import session
 from cruds.agent_cruds import agent_cruds
 from cruds.source_of_income_cruds import source_of_income_cruds
+from helpers.enums.currency_enum import CurrencyEnum
 from models.admins import LoanAdminsModel
 from models.earning_model import EarningsModel
 from models.sources_of_income_model import SourcesOfIncomeModel
+from models.withdraw_model import WithdrawModel
 
 
 class EarningsCruds:
     @staticmethod
-    def insert_source(summa: str, comment: str,
-                      agent_id: Optional[str],
-                      source_id: Optional[str],
-                      currency: str,
-                      is_other_source: str):
+    def insert_source(summa: str, comment: str, agent_id: Optional[str], source_id: Optional[str], currency: str, is_other_source: str):
         source_name = source_of_income_cruds.get_source_by_source_id(source_id)
-        source = EarningsModel(summa=summa,
-                               comment=comment,
-                               agent_source_id=agent_id,
-                               admin_char=agent_cruds.get_by_id(agent_id).admin_username,
-                               income_source_id=source_id,
-                               currency=currency,
-                               is_other_source=is_other_source,
-                               source_name=source_name.source)
+        source = EarningsModel(
+            summa=summa,
+            comment=comment,
+            agent_source_id=agent_id,
+            admin_char=agent_cruds.get_by_id(agent_id).admin_username,
+            income_source_id=source_id,
+            currency=currency,
+            is_other_source=is_other_source,
+            source_name=source_name.source,
+            source_percent=source_name.percent,
+        )
 
         source.id = uuid.uuid4()
 
@@ -38,10 +40,7 @@ class EarningsCruds:
     @staticmethod
     def get_earning_by_agent_id(agent_id: uuid.UUID) -> EarningsModel:
         return (
-            session.query(EarningsModel)
-            .order_by(desc(EarningsModel.time_created))
-            .filter(EarningsModel.agent_source_id == agent_id)
-            .all()
+            session.query(EarningsModel).order_by(desc(EarningsModel.time_created)).filter(EarningsModel.agent_source_id == agent_id).all()
         )
 
     @staticmethod
@@ -68,18 +67,31 @@ class EarningsCruds:
 
     @staticmethod
     def get_all_for_xlsx():
-        query = session.query(
-            EarningsModel.time_created,
-            EarningsModel.summa,
-            EarningsModel.comment,
-            EarningsModel.currency,
-            EarningsModel.source_name,
+        earnings_query = (
+            session.query(
+                EarningsModel.time_created.label('time_created'),
+                EarningsModel.summa,
+                EarningsModel.comment,
+                EarningsModel.currency,
+                EarningsModel.source_name,
+                LoanAdminsModel.admin_username,
+                literal('earnings').label('source'),
+            )
+            .join(LoanAdminsModel, LoanAdminsModel.id == EarningsModel.agent_source_id)
+            .join(SourcesOfIncomeModel, SourcesOfIncomeModel.id == EarningsModel.income_source_id)
+        )
+
+        withdraw_query = session.query(
+            WithdrawModel.time_created.label('time_created'),
+            WithdrawModel.summa * -1,
+            null().label('comment'),
+            literal(CurrencyEnum.DOLLAR).label('currency'),
+            null().label('source_name'),
             LoanAdminsModel.admin_username,
-        ).join(
-            LoanAdminsModel, LoanAdminsModel.id == EarningsModel.agent_source_id
-        ).join(
-            SourcesOfIncomeModel, SourcesOfIncomeModel.id == EarningsModel.income_source_id
-        ).order_by(desc(EarningsModel.time_created))
+            literal('withdraw').label('source'),
+        ).join(LoanAdminsModel, LoanAdminsModel.id == WithdrawModel.agent_source_id)
+
+        query = earnings_query.union(withdraw_query).order_by(desc(text('time_created')))
 
         return query.all()
 
