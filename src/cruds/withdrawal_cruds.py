@@ -1,12 +1,16 @@
+import logging
 import uuid
 from datetime import timedelta
 
 from sqlalchemy import asc, desc
 
 from create_engine import session
+from cruds.agent_cruds import agent_cruds
 from models.admins import LoanAdminsModel
 from models.earning_model import EarningsModel
 from models.withdraw_model import WithdrawModel
+
+logging.basicConfig(filename="../sample.log", level=logging.ERROR)
 
 
 class WithdrawalCruds:
@@ -43,7 +47,8 @@ class WithdrawalCruds:
                 .all()
             )
         return (
-            session.query(WithdrawModel).order_by(asc(WithdrawModel.time_created)).filter(WithdrawModel.agent_source_id == agent.id).all()
+            session.query(WithdrawModel).order_by(asc(WithdrawModel.time_created)).filter(
+                WithdrawModel.agent_source_id == agent.id).all()
         )
 
     @staticmethod
@@ -91,6 +96,23 @@ class WithdrawalCruds:
         )
 
         return query.all()
+
+    @staticmethod
+    def update_withdraw_data(time_created, summa, admin_username):
+        try:
+            withdraw = WithdrawModel(summa=summa * -1, agent_source_id=agent_cruds.get_by_username(admin_username).id,
+                                     time_created=time_created, admin_char=admin_username)
+
+            withdraw.id = uuid.uuid4()
+
+            session.add(withdraw)
+
+            session.commit()
+
+            session.close()
+        except Exception as e:
+            session.rollback()
+            logging.error(e)
 
 
 withdraw_cruds = WithdrawalCruds()

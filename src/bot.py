@@ -1,4 +1,6 @@
 import logging
+import os
+
 import telebot
 
 from buttons.buttons_if_logged_in import buttons_if_logged_in
@@ -17,6 +19,8 @@ from helpers.decorators.is_logged_in_decorator import login_required
 
 from helpers.check_password import check_password_and_set_privacy
 from helpers.withdrawal_helper import withdrawal_helper
+from xlsx.xlsx_handler import xlsx_handler_helper
+from xlsx.xlsx_reader import XlsxDataUpdater
 
 loan = telebot.TeleBot(creds.Creds.LOAN_BOT_ID)
 logging.basicConfig(filename="sample.log", level=logging.ERROR)
@@ -78,6 +82,12 @@ def my_balance(message):
 @login_required
 def insert_data(message):
     buttons_insert_data(message, loan)
+
+
+@loan.message_handler(commands=["document"])
+@login_required
+def handle_document(message):
+    xlsx_handler_helper(message, loan)
 
 
 @loan.callback_query_handler(func=lambda call: True)
