@@ -47,8 +47,7 @@ class WithdrawalCruds:
                 .all()
             )
         return (
-            session.query(WithdrawModel).order_by(asc(WithdrawModel.time_created)).filter(
-                WithdrawModel.agent_source_id == agent.id).all()
+            session.query(WithdrawModel).order_by(asc(WithdrawModel.time_created)).filter(WithdrawModel.agent_source_id == agent.id).all()
         )
 
     @staticmethod
@@ -98,21 +97,25 @@ class WithdrawalCruds:
         return query.all()
 
     @staticmethod
-    def update_withdraw_data(time_created, summa, admin_username):
-        try:
-            withdraw = WithdrawModel(summa=summa * -1, agent_source_id=agent_cruds.get_by_username(admin_username).id,
-                                     time_created=time_created, admin_char=admin_username)
+    def update_withdraw_data(time_created, summa, admin_username, identifier: str):
+        withdraw = session.query(WithdrawModel).filter(WithdrawModel.id == identifier).first()
+        if withdraw:
+            withdraw.summa = summa
+        else:
+            withdraw = WithdrawModel(
+                summa=summa * -1,
+                agent_source_id=agent_cruds.get_by_username(admin_username).id,
+                time_created=time_created,
+                admin_char=admin_username,
+            )
 
-            withdraw.id = uuid.uuid4()
+            withdraw.id = identifier
 
             session.add(withdraw)
 
-            session.commit()
+        session.commit()
 
-            session.close()
-        except Exception as e:
-            session.rollback()
-            logging.error(e)
+        session.close()
 
 
 withdraw_cruds = WithdrawalCruds()

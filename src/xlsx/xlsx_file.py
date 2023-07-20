@@ -9,7 +9,7 @@ from helpers.enums.currency_enum import CurrencyEnum
 from helpers.enums.inline_buttons_helper_enum import InlineButtonsHelperEnum
 from helpers.enums.xlsx_enum import XlsxEnum
 
-earnings_columns = ['Time Created', 'Summa', 'Comment', 'Currency', 'Source Name', 'Admin Username', "Source"]
+earnings_columns = ['ID', 'Time Created', 'Summa', 'Comment', 'Currency', 'Source Name', 'Admin Username', "Source"]
 
 currency_mapper = {CurrencyEnum.EURO: "€", CurrencyEnum.UAH: "UAH", CurrencyEnum.DOLLAR: '$'}
 
@@ -35,8 +35,8 @@ def generate_xlsx_file():
     sheet1.auto_filter.ref = earnings_range
 
     # Add filter by Summa in 'Earnings' sheet
-    sheet1.auto_filter.add_filter_column(0, [], blank=False)
-    sheet1.auto_filter.add_filter_column(0, [">0"])
+    sheet1.auto_filter.add_filter_column(1, [], blank=False)
+    sheet1.auto_filter.add_filter_column(1, [">0"])
 
     workbook.save(output_file)
 
@@ -47,21 +47,25 @@ def _adapt_sheet_1(sheet):
     sheet.column_dimensions['A'].width = 15
     sheet.row_dimensions[1].height = 20
 
-    sheet.column_dimensions['B'].width = 10
-    sheet.row_dimensions[1].height = 10
+    sheet.column_dimensions['B'].width = 15
+    sheet.row_dimensions[1].height = 15
 
-    sheet.column_dimensions['C'].width = 50
+    sheet.column_dimensions['C'].width = 15
+    sheet.row_dimensions[1].height = 25
+
+    sheet.column_dimensions['D'].width = 50
     sheet.row_dimensions[1].height = 90
-
-    sheet.column_dimensions['D'].width = 15
-    sheet.row_dimensions[1].height = 20
 
     sheet.column_dimensions['E'].width = 15
     sheet.row_dimensions[1].height = 25
 
     sheet.column_dimensions['F'].width = 15
     sheet.row_dimensions[1].height = 25
+
     sheet.column_dimensions['G'].width = 15
+    sheet.row_dimensions[1].height = 20
+
+    sheet.column_dimensions['H'].width = 15
     sheet.row_dimensions[1].height = 20
 
     sheet.sheet_view.zoomScale = 130

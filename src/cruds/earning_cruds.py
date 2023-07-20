@@ -20,8 +20,7 @@ from models.withdraw_model import WithdrawModel
 
 class EarningsCruds:
     @staticmethod
-    def insert_source(summa: str, comment: str, agent_id: Optional[str], source_id: Optional[str], currency: str,
-                      is_other_source: str):
+    def insert_source(summa: str, comment: str, agent_id: Optional[str], source_id: Optional[str], currency: str, is_other_source: str):
         source_name = source_of_income_cruds.get_source_by_source_id(source_id)
         source = EarningsModel(
             summa=summa,
@@ -44,8 +43,7 @@ class EarningsCruds:
     @staticmethod
     def get_earning_by_agent_id(agent_id: uuid.UUID) -> EarningsModel:
         return (
-            session.query(EarningsModel).order_by(desc(EarningsModel.time_created)).filter(
-                EarningsModel.agent_source_id == agent_id).all()
+            session.query(EarningsModel).order_by(desc(EarningsModel.time_created)).filter(EarningsModel.agent_source_id == agent_id).all()
         )
 
     @staticmethod
@@ -74,6 +72,7 @@ class EarningsCruds:
     def get_all_for_xlsx():
         earnings_query = (
             session.query(
+                EarningsModel.id,
                 EarningsModel.time_created.label('time_created'),
                 EarningsModel.summa,
                 EarningsModel.comment,
@@ -87,6 +86,7 @@ class EarningsCruds:
         )
 
         withdraw_query = session.query(
+            WithdrawModel.id,
             WithdrawModel.time_created.label('time_created'),
             WithdrawModel.summa * -1,
             null().label('comment'),
@@ -101,14 +101,22 @@ class EarningsCruds:
         return query.all()
 
     @staticmethod
-    def update_earning_from_xlsx(time_created, summa, comment, currency, source_name, admin_username):
-        try:
-            source_name = source_name if not isinstance(source_name, float) or not math.isnan(
-                source_name) else InlineButtonsHelperEnum.OTHER.value
+    def update_earning_from_xlsx(time_created, summa, comment, currency, source_name, admin_username, identifier: str):
+        earnings = session.query(EarningsModel).filter(EarningsModel.id == identifier).first()
 
+        source_name = (
+            source_name if not isinstance(source_name, float) or not math.isnan(source_name) else InlineButtonsHelperEnum.OTHER.value
+        )
+
+        comment = comment if not isinstance(comment, float) or not math.isnan(comment) else ''
+        currency = CurrencyEnum.UAH if currency == 'UAH' else currency
+        if earnings:
+            earnings.summa = summa
+            earnings.comment = comment
+            earnings.currency = currency
+            earnings.source_name = source_name
+        else:
             source = source_of_income_cruds.get_source_by_source_name(source_name)
-
-            comment = comment if not isinstance(comment, float) or not math.isnan(comment) else ''
 
             currency = CurrencyEnum.UAH if currency == 'UAH' else currency
             new_earnings = EarningsModel(
@@ -120,18 +128,15 @@ class EarningsCruds:
                 source_name=source_name,
                 admin_char=admin_username,
                 agent_source_id=agent_cruds.get_by_username(admin_username).id,
-                source_percent=source.percent
+                source_percent=source.percent,
             )
-            new_earnings.id = uuid.uuid4()
+            new_earnings.id = identifier
 
             session.add(new_earnings)
 
-            session.commit()
-            session.close()
+        session.commit()
 
-        except Exception as e:
-            session.rollback()
-            logging.error(e)
+        session.close()
 
 
 earnings_cruds = EarningsCruds()

@@ -22,24 +22,17 @@ def get_agent_balance(message, loan, agent: LoanAdminsModel):
     earnings = earnings_cruds.get_earning_by_agent_id(agent.id)
     message_data = create_balance_message(agent.admin_username, earnings)
 
-    loan.send_message(chat_id=message.chat.id, text=message_data,
-                      parse_mode='MarkdownV2',
-                      reply_markup=generate_keyboard())
+    loan.send_message(chat_id=message.chat.id, text=message_data, parse_mode='MarkdownV2', reply_markup=generate_keyboard())
 
 
 def get_more_agent_balance(message, loan, agent):
     earnings = earnings_cruds.get_earning_by_agent_id(agent.id)
-    message_data = create_balance_history(earnings[starter['start']:starter['start'] + BalancePaginator.PAGE.value],
-                                          withdraw=None)
+    message_data = create_balance_history(earnings[starter['start'] : starter['start'] + BalancePaginator.PAGE.value], withdraw=None)
     starter['start'] = starter['start'] + BalancePaginator.PAGE.value
     if starter['start'] <= len(earnings):
-        loan.send_message(chat_id=message.chat.id,
-                          text=message_data,
-                          parse_mode='MarkdownV2',
-                          reply_markup=generate_keyboard())
+        loan.send_message(chat_id=message.chat.id, text=message_data, parse_mode='MarkdownV2', reply_markup=generate_keyboard())
     else:
-        loan.send_message(chat_id=message.chat.id,
-                          text='Конец истории', parse_mode='MarkdownV2')
+        loan.send_message(chat_id=message.chat.id, text='Конец истории', parse_mode='MarkdownV2')
 
 
 def generate_keyboard():

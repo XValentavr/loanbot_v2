@@ -24,7 +24,7 @@ def create_balance_message(agent_username, earnings, include_history=True):
     withdraw = withdraw_cruds.get_all_by_agent_id_and_time(agent, date_to_check=None)
 
     balances = create_balance(earnings, withdraw=withdraw)
-    history = create_balance_history(earnings[0:BalancePaginator.PAGE.value], withdraw=withdraw)
+    history = create_balance_history(earnings[0 : BalancePaginator.PAGE.value], withdraw=withdraw)
     if balances or history:
         for currency, balance in balances.items():
             table.add_row([currency, balance])
@@ -39,13 +39,11 @@ def dollar_calculator(earnings: List[EarningsModel]):
 
 
 def eur_calculator(earnings: List[EarningsModel]):
-    return str(round(sum([float(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.EURO]), 2)).replace(
-        '.', ',')
+    return str(round(sum([float(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.EURO]), 2)).replace('.', ',')
 
 
 def uah_calculator(earnings: List[EarningsModel]):
-    return str(round(sum([float(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.UAH]), 2)).replace(
-        '.', ',')
+    return str(round(sum([float(earn.summa) for earn in earnings if earn.currency == CurrencyEnum.UAH]), 2)).replace('.', ',')
 
 
 def create_balance(earnings, withdraw: List = [0.0]) -> Dict:

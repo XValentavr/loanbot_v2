@@ -29,5 +29,6 @@ def xlsx_handler_function(message, loan):
             loan.reply_to(message, message_success)
     except Exception as e:
         logging.error(e)
+        loan.reply_to(message, 'Ошибка. Повторите попытку')
     finally:
         os.remove(file_path)

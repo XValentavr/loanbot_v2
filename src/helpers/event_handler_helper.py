@@ -76,16 +76,14 @@ def event_other_buttons_helper(call, agent, loan):
             expense = True
             del has_expense[agent.admin_username]
 
-        ready_event(message=call.message, agent=agent, loan=loan, expense=expense,
-                    source=agent_set_income_source.get(agent.admin_username))
+        ready_event(message=call.message, agent=agent, loan=loan, expense=expense, source=agent_set_income_source.get(agent.admin_username))
 
     elif call.data == InlineButtonsHelperEnum.CHANGE:
         change_event(message=call.message, loan=loan)
 
     elif call.data == InlineButtonsEnum.PREV_INCOMES:
         loan.send_message(
-            chat_id=call.message.chat.id, text=get_profit_of_other_dates(agent), parse_mode='MarkdownV2',
-            reply_markup=buttons_back()
+            chat_id=call.message.chat.id, text=get_profit_of_other_dates(agent), parse_mode='MarkdownV2', reply_markup=buttons_back()
         )
 
     elif call.data in income_sources and call.data != InlineButtonsHelperEnum.OTHER:
@@ -116,14 +114,12 @@ def main_agent_command_helper(call, loan, agent):
         mnth, _ = get_current_month()
 
         current_month_year['month'] = mnth
-        get_agents_balance(message=call.message, loan=loan,
-                           agent_username=main_agent_get_info_about[agent.admin_username])
+        get_agents_balance(message=call.message, loan=loan, agent_username=main_agent_get_info_about[agent.admin_username])
     elif call.data == HelperMainAgentEnum.MAIN_AGENT_WITHDRAW:
         mnth, _ = get_current_month()
 
         current_month_year['month'] = mnth
-        create_withdrawn_for_main_agent(call.message, loan,
-                                        agent_username=main_agent_get_info_about[agent.admin_username])
+        create_withdrawn_for_main_agent(call.message, loan, agent_username=main_agent_get_info_about[agent.admin_username])
     elif call.data == HelperMainAgentEnum.MORE_HISTORY:
         prev_month = get_prev_month(current_month_year['month'])
         current_month_year['month'] = calendar.month_name[prev_month]
