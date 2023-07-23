@@ -31,12 +31,8 @@ def generate_xlsx_file():
 
     _conditional_formatting(sheet1, earnings)
 
-    earnings_range = f"B1:{get_column_letter(len(earnings.columns))}{len(earnings) + 1}"
+    earnings_range = f"C1:{get_column_letter(len(earnings.columns))}{len(earnings) + 1}"
     sheet1.auto_filter.ref = earnings_range
-
-    # Add filter by Summa in 'Earnings' sheet
-    sheet1.auto_filter.add_filter_column(1, [], blank=False)
-    sheet1.auto_filter.add_filter_column(1, [">0"])
 
     workbook.save(output_file)
 
@@ -91,17 +87,24 @@ def _create_rows(sheet, table):
             sheet.cell(row=r, column=c, value=value.replace('\\', '') if isinstance(value, str) else value)
 
 
-def _conditional_formatting(sheet, model, model_name: str = None):
+def _conditional_formatting(sheet, model):
     for row in sheet.iter_rows(min_row=2, max_row=len(model) + 1):
         summa_cell = row[earnings_columns.index('Summa')]
-        if summa_cell.value < 0 or model_name == 'withdraw':
-            summa_cell.font = Font(color="C0504E")  # Set text color to white for negative values
-        else:
-            summa_cell.font = Font(color="4F6328")  # Set text color to black for positive values
+        withdraw_cell = row[earnings_columns.index('Source')]
+
+        withdraw_value = withdraw_cell.value.lower()
+        summa_value = summa_cell.value
+
+        if withdraw_value == 'withdraw':
+            withdraw_cell.value = withdraw_value.upper()
+            withdraw_cell.font = Font(color="FF0000")
+
+        summa_cell.font = Font(color="C0504E" if summa_value < 0 else "4F6328")
 
 
 def _wrap_text(sheet, columns):
     for column in columns:
-        column_letter = chr(ord('A') + columns.index(column))
-        for cell in sheet[column_letter]:
-            cell.alignment = cell.alignment.copy(wrap_text=True)
+        if column != 'A':
+            column_letter = chr(ord('B') + columns.index(column))
+            for cell in sheet[column_letter]:
+                cell.alignment = cell.alignment.copy(wrap_text=True)
