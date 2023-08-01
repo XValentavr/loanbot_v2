@@ -2,7 +2,9 @@ import re
 
 
 def regex_escaper(string):
-    return re.escape(string)
+    string =  re.escape(string)
+    string = string.replace('=', '\\=')
+    return string
 
 
 def remove_all_chars(withdrawal: str):
