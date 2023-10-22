@@ -71,12 +71,12 @@ def event_other_buttons_helper(call, agent, loan):
 
     if call.data == InlineButtonsHelperEnum.READY:
         expense = False
-
+        call_count = {'call': 0}
         if has_expense.get(agent.admin_username):
             expense = True
             del has_expense[agent.admin_username]
 
-        ready_event(message=call.message, agent=agent, loan=loan, expense=expense, source=agent_set_income_source.get(agent.admin_username))
+        ready_event(message=call.message,call_count=call_count, agent=agent, loan=loan, expense=expense, source=agent_set_income_source.get(agent.admin_username))
 
     elif call.data == InlineButtonsHelperEnum.CHANGE:
         change_event(message=call.message, loan=loan)
