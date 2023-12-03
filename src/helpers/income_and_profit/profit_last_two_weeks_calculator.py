@@ -142,9 +142,14 @@ def create_proportional_parts_of_month(month=None):
     else:
         current_month = list(calendar.month_name).index(month.get('month').capitalize()) + 1
         current_year = month.get('year')
+    if current_month == 12:
+        next_month = 1
+        next_year = current_year + 1
+    else:
+        next_month = current_month + 1
+        next_year = current_year
 
-    days_in_month = date(current_year, current_month + 1, 1) - date(current_year, current_month, 1)
-    # Calculate the start and end dates of the two proportional parts
+    days_in_month = date(next_year, next_month, 1) - date(current_year, current_month, 1)
     interval_start_first = date(current_year, current_month, 1)
     interval_end_first = date(current_year, current_month, int(days_in_month.days / 2))
 
