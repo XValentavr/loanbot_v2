@@ -35,3 +35,5 @@ class EarningsModel(BaseModel):
     time_created = Column(DateTime(timezone=True), server_default=func.now())
     source_name = Column(String(255), nullable=True)
     source_percent = Column(String(20), nullable=False)
+    uah = Column(String(20), nullable=False)
+    eur = Column(String(20), nullable=False)

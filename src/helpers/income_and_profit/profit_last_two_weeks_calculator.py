@@ -82,10 +82,12 @@ def get_all_summa_of_profit(profit):
             earned += round(percent_calculator(percent=profit.source_percent, summa=profit.summa), 2)
 
         elif profit.currency == CurrencyEnum.UAH:
-            earned += round(percent_calculator(percent=profit.source_percent, summa=profit.summa), 2) / float(profit.uah)
+            earned += round(percent_calculator(percent=profit.source_percent, summa=profit.summa), 2) / float(
+                profit.uah.replace(',', '.'))
 
         elif profit.currency == CurrencyEnum.EURO:
-            earned += round(percent_calculator(percent=profit.source_percent, summa=profit.summa), 2) / float(profit.eur)
+            earned += round(percent_calculator(percent=profit.source_percent, summa=profit.summa), 2) / float(
+                profit.eur.replace(',', '.'))
 
     return float(round(earned, 2))
 
