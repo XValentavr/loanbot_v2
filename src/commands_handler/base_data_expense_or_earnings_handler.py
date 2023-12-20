@@ -5,6 +5,7 @@ from buttons.buttons_back import buttons_back
 from buttons.buttons_if_logged_in import buttons_if_logged_in
 from cruds.earning_cruds import earnings_cruds
 from cruds.source_of_income_cruds import source_of_income_cruds
+from helpers.apis.get_currency_api import get_actual_currency
 from helpers.enums.error_enum import ErrorEnum
 from helpers.enums.inline_buttons_helper_enum import InlineButtonsHelperEnum
 from helpers.income_and_profit.extract_summa_and_currency import extract_necessary_data
@@ -52,6 +53,7 @@ def ready_event(message, agent, loan, source, expense, call_count):
     try:
         amount, currency, text = extract_necessary_data(message.text)
         call_count = call_count and call_count.get('call')
+        uah, eur = get_actual_currency()
         if call_count is not None and call_count == 0:
             if text == ErrorEnum.CURRENCY_NOT_FOUND:
                 loan.send_message(message.chat.id, ErrorEnum.CURRENCY_NOT_FOUND, reply_to_message_id=message.id)
@@ -65,6 +67,8 @@ def ready_event(message, agent, loan, source, expense, call_count):
                     else source_of_income_cruds.get_source_by_source_name(InlineButtonsHelperEnum.OTHER).id,
                     agent_id=agent.id,
                     currency=currency,
+                    eur=eur,
+                    uah=uah,
                     is_other_source=other_source.get(agent.admin_username) if other_source.get(agent.admin_username) and not expense else None,
                 )
 

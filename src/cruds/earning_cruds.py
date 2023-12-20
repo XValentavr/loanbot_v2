@@ -20,7 +20,8 @@ from models.withdraw_model import WithdrawModel
 
 class EarningsCruds:
     @staticmethod
-    def insert_source(summa: str, comment: str, agent_id: Optional[str], source_id: Optional[str], currency: str, is_other_source: str):
+    def insert_source(summa: str, comment: str, agent_id: Optional[str], source_id: Optional[str], currency: str,
+                      is_other_source: str, uah, eur):
         source_name = source_of_income_cruds.get_source_by_source_id(source_id)
         source = EarningsModel(
             summa=summa,
@@ -32,6 +33,8 @@ class EarningsCruds:
             is_other_source=is_other_source,
             source_name=source_name.source,
             source_percent=source_name.percent,
+            uah=uah,
+            eur=eur
         )
 
         source.id = uuid.uuid4()
@@ -43,7 +46,9 @@ class EarningsCruds:
     @staticmethod
     def get_earning_by_agent_id(agent_id: uuid.UUID) -> EarningsModel:
         return (
-            session.query(EarningsModel).order_by(desc(EarningsModel.time_created)).filter(EarningsModel.agent_source_id == agent_id).all()
+            session.query(EarningsModel).order_by(desc(EarningsModel.time_created)).filter(
+                EarningsModel.agent_source_id == agent_id,
+                EarningsModel.id == '889ddcb1-30c3-40b1-af9f-4911e8354a14').all()
         )
 
     @staticmethod
@@ -105,7 +110,8 @@ class EarningsCruds:
         earnings = session.query(EarningsModel).filter(EarningsModel.id == identifier).first()
 
         source_name = (
-            source_name if not isinstance(source_name, float) or not math.isnan(source_name) else InlineButtonsHelperEnum.OTHER.value
+            source_name if not isinstance(source_name, float) or not math.isnan(
+                source_name) else InlineButtonsHelperEnum.OTHER.value
         )
 
         comment = comment if not isinstance(comment, float) or not math.isnan(comment) else ''
