@@ -47,8 +47,7 @@ class EarningsCruds:
     def get_earning_by_agent_id(agent_id: uuid.UUID) -> EarningsModel:
         return (
             session.query(EarningsModel).order_by(desc(EarningsModel.time_created)).filter(
-                EarningsModel.agent_source_id == agent_id,
-                EarningsModel.id == '889ddcb1-30c3-40b1-af9f-4911e8354a14').all()
+                EarningsModel.agent_source_id == agent_id).all()
         )
 
     @staticmethod
