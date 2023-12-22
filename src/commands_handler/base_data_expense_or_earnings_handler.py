@@ -5,11 +5,11 @@ from buttons.buttons_back import buttons_back
 from buttons.buttons_if_logged_in import buttons_if_logged_in
 from cruds.earning_cruds import earnings_cruds
 from cruds.source_of_income_cruds import source_of_income_cruds
-from helpers.apis.get_currency_api import get_actual_currency
 from helpers.enums.error_enum import ErrorEnum
 from helpers.enums.inline_buttons_helper_enum import InlineButtonsHelperEnum
 from helpers.income_and_profit.extract_summa_and_currency import extract_necessary_data
 from helpers.inform_message_creator.create_balance_message import check_if_float
+from helpers.scraper import website_scraper
 from send_to_owner.send_message_to_owner import send_message_to_owner
 
 other_source: Dict = {}
@@ -53,7 +53,9 @@ def ready_event(message, agent, loan, source, expense, call_count):
     try:
         amount, currency, text = extract_necessary_data(message.text)
         call_count = call_count and call_count.get('call')
-        uah, eur = get_actual_currency()
+
+        exchange_uah = website_scraper.extract_prices()
+
         if call_count is not None and call_count == 0:
             if text == ErrorEnum.CURRENCY_NOT_FOUND:
                 loan.send_message(message.chat.id, ErrorEnum.CURRENCY_NOT_FOUND, reply_to_message_id=message.id)
@@ -67,12 +69,13 @@ def ready_event(message, agent, loan, source, expense, call_count):
                     else source_of_income_cruds.get_source_by_source_name(InlineButtonsHelperEnum.OTHER).id,
                     agent_id=agent.id,
                     currency=currency,
-                    eur=eur,
-                    uah=uah,
-                    is_other_source=other_source.get(agent.admin_username) if other_source.get(agent.admin_username) and not expense else None,
+                    eur=0.91,
+                    uah=exchange_uah,
+                    is_other_source=other_source.get(agent.admin_username) if other_source.get(
+                        agent.admin_username) and not expense else None,
                 )
 
-                loan.send_message(message.chat.id, "Транзакция успешная!")
+                loan.send_message(message.chat.id, f"Транзакция успешная! \nКурс USD/UAH: {exchange_uah}")
                 send_message_to_owner(loan, earning, agent.admin_username)
                 if other_source.get(agent.admin_username):
                     del other_source[agent.admin_username]
@@ -80,7 +83,8 @@ def ready_event(message, agent, loan, source, expense, call_count):
                 buttons_if_logged_in(message, loan)
     except Exception:
         loan.send_message(
-            message.chat.id, "Что-то пошло не так, попробуйте ещё раз", reply_to_message_id=message.id, reply_markup=buttons_back()
+            message.chat.id, "Что-то пошло не так, попробуйте ещё раз", reply_to_message_id=message.id,
+            reply_markup=buttons_back()
         )
 
 

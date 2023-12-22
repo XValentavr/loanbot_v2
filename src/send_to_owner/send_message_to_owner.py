@@ -5,10 +5,10 @@ from models.earning_model import EarningsModel
 def generate_message_for_owner(instance: EarningsModel, admin: str):
     summa = instance.summa
     if '-' not in summa:
-        return f'{admin} внес доход {instance.summa}{instance.currency}\nКлиент - {instance.source_name}\n{instance.comment}'.replace(
+        return f'{admin} внес доход {instance.summa}{instance.currency}\nКлиент - {instance.source_name}\n{instance.comment}\\. Курс USD/UAH: {instance.uah}'.replace(
             '\\', ''
         )
-    return f'{admin} внес расход {instance.summa}{instance.currency}\n{instance.comment}'.replace('\\', '')
+    return f'{admin} внес расход {instance.summa}{instance.currency}\n{instance.comment}\\. Курс USD/UAH: {instance.uah}'.replace('\\', '')
 
 
 def generate_withdraw_message_for_owner(summa: str, admin: str):
