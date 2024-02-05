@@ -114,7 +114,7 @@ def main_agent_command_helper(call, loan, agent):
         mnth, _ = get_current_month()
 
         current_month_year['month'] = mnth
-        get_agents_balance(message=call.message, loan=loan, agent_username=main_agent_get_info_about[agent.admin_username])
+        get_agents_balance(message=call.message, loan=loan, agent_username=main_agent_get_info_about[agent.admin_username], balance_=True)
     elif call.data == HelperMainAgentEnum.MAIN_AGENT_WITHDRAW:
         mnth, _ = get_current_month()
 

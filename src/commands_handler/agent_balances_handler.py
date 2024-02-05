@@ -32,7 +32,7 @@ def handler_agent_balances(message, loan, agent):
     buttons_all_agents(message, loan, agents)
 
 
-def get_agents_balance(message, loan, agent_username, current_month_year=None):
+def get_agents_balance(message, loan, agent_username, current_month_year=None, balance_=False):
     """
     Get agents story for main agent
     :param message: message of chat
@@ -42,11 +42,6 @@ def get_agents_balance(message, loan, agent_username, current_month_year=None):
     :return: None
     """
     current_month = datetime.datetime.now().strftime("%B")
-    is_current_month = True
-
-    if current_month_year:
-        is_current_month = True if current_month == current_month_year['month'] else False
-
     first_part, second_part = create_proportional_parts_of_month(month=current_month_year)
 
     agent_to_check = agent_cruds.get_by_username(agent_username)
@@ -61,21 +56,30 @@ def get_agents_balance(message, loan, agent_username, current_month_year=None):
 
     profits_first_part = get_profit_of_other_dates(agent_to_check, calculate_date=False, partial=first_part)
     history_first_part = (
-        profits_first_part + '\n\n' + '\n'.join(create_incomes_story(get_history(agent_to_check, date_to_check=first_part))) + '\n\n'
+            profits_first_part + '\n\n' + '\n'.join(
+        create_incomes_story(get_history(agent_to_check, date_to_check=first_part))) + '\n\n'
     )
 
     profits_second_part = get_profit_of_other_dates(agent_to_check, calculate_date=False, partial=second_part)
     history_second_part = (
-        profits_second_part + '\n\n' + '\n'.join(create_incomes_story(get_history(agent_to_check, date_to_check=second_part))) + '\n\n'
+            profits_second_part + '\n\n' + '\n'.join(
+        create_incomes_story(get_history(agent_to_check, date_to_check=second_part))) + '\n\n'
     )
 
     complex_history = generate_string_for_graded_month(
         history_first_part.strip(), history_second_part.strip(), for_main_agent=True, months=current_month_year
     )
-    message_of_agent = agent_username_mapper.get(agent_username) + '\n\n' + create_message(balance, complex_history.strip())
+    if balance_:
+        complex_history = ''
+    message_of_agent = agent_username_mapper.get(agent_username) + '\n\n' + create_message(balance,
+                                                                                           complex_history.strip())
 
-    if is_current_month or ('пока нет' not in history_first_part or 'пока нет' not in history_second_part):
-        buttons_agent_history(message, loan, message_of_agent + create_withdraw_string(withdraw))
+    if 'пока нет' not in history_first_part or 'пока нет' not in history_second_part:
+        if not balance_:
+            message_ = message_of_agent + create_withdraw_string(withdraw)
+        else:
+            message_ = message_of_agent
+        buttons_agent_history(message, loan, message_)
     else:
         loan.send_message(message.chat.id, "Больше ничего не найдено", reply_markup=buttons_back())
 
@@ -103,10 +107,10 @@ def create_message(balance, history):
 
 
 def get_history(
-    agent,
-    date_to_check,
-    start=0,
-    end=int(HelperMainAgentEnum.LIMIT),
+        agent,
+        date_to_check,
+        start=0,
+        end=int(HelperMainAgentEnum.LIMIT),
 ):
     """
     Get earnings history of transactions

@@ -2,11 +2,18 @@ import calendar
 import datetime
 
 
-def get_current_month():
+def get_previous_month():
     current_date = datetime.date.today()
     previous_month = current_date.replace(day=1) - datetime.timedelta(days=1)
     previous_month_name = previous_month.strftime("%B")
     previous_month_year = previous_month.year
+    return previous_month_name, previous_month_year
+
+
+def get_current_month():
+    current_date = datetime.date.today()
+    previous_month_name = current_date.strftime("%B")
+    previous_month_year = current_date.year
     return previous_month_name, previous_month_year
 
 
