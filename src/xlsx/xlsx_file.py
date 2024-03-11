@@ -14,8 +14,8 @@ earnings_columns = ['ID', 'Time Created', 'Summa', 'Comment', 'Currency', 'Sourc
 currency_mapper = {CurrencyEnum.EURO: "€", CurrencyEnum.UAH: "UAH", CurrencyEnum.DOLLAR: '$'}
 
 
-def generate_xlsx_file():
-    earnings = pd.DataFrame(earnings_cruds.get_all_for_xlsx(), columns=earnings_columns)
+def generate_xlsx_file(partial=False):
+    earnings = pd.DataFrame(earnings_cruds.get_all_for_xlsx(partial), columns=earnings_columns)
 
     workbook = Workbook()
 

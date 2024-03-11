@@ -1,9 +1,9 @@
 import logging
 import uuid
-from datetime import timedelta
+from datetime import timedelta, datetime
 from typing import Optional
 
-from sqlalchemy import asc, desc, null, text
+from sqlalchemy import asc, desc, null, text, and_
 from sqlalchemy import literal
 import math
 
@@ -73,36 +73,76 @@ class EarningsCruds:
         return earnings[start:end]
 
     @staticmethod
-    def get_all_for_xlsx():
-        earnings_query = (
-            session.query(
-                EarningsModel.id,
-                EarningsModel.time_created.label('time_created'),
-                EarningsModel.summa,
-                EarningsModel.comment,
-                EarningsModel.currency,
-                EarningsModel.source_name,
-                LoanAdminsModel.admin_username,
-                literal('earnings').label('source'),
+    def get_all_for_xlsx(partial=False):
+        if not partial:
+            earnings_query = (
+                session.query(
+                    EarningsModel.id,
+                    EarningsModel.time_created.label('time_created'),
+                    EarningsModel.summa,
+                    EarningsModel.comment,
+                    EarningsModel.currency,
+                    EarningsModel.source_name,
+                    LoanAdminsModel.admin_username,
+                    literal('earnings').label('source'),
+                )
+                .join(LoanAdminsModel, LoanAdminsModel.id == EarningsModel.agent_source_id)
+                .join(SourcesOfIncomeModel, SourcesOfIncomeModel.id == EarningsModel.income_source_id)
             )
-            .join(LoanAdminsModel, LoanAdminsModel.id == EarningsModel.agent_source_id)
-            .join(SourcesOfIncomeModel, SourcesOfIncomeModel.id == EarningsModel.income_source_id)
-        )
 
-        withdraw_query = session.query(
-            WithdrawModel.id,
-            WithdrawModel.time_created.label('time_created'),
-            WithdrawModel.summa * -1,
-            null().label('comment'),
-            literal(CurrencyEnum.DOLLAR).label('currency'),
-            null().label('source_name'),
-            LoanAdminsModel.admin_username,
-            literal('withdraw').label('source'),
-        ).join(LoanAdminsModel, LoanAdminsModel.id == WithdrawModel.agent_source_id)
+            withdraw_query = session.query(
+                WithdrawModel.id,
+                WithdrawModel.time_created.label('time_created'),
+                WithdrawModel.summa * -1,
+                null().label('comment'),
+                literal(CurrencyEnum.DOLLAR).label('currency'),
+                null().label('source_name'),
+                LoanAdminsModel.admin_username,
+                literal('withdraw').label('source'),
+            ).join(LoanAdminsModel, LoanAdminsModel.id == WithdrawModel.agent_source_id)
 
-        query = earnings_query.union(withdraw_query).order_by(desc(text('time_created')))
+            query = earnings_query.union(withdraw_query).order_by(desc(text('time_created')))
 
-        return query.all()
+            return query.all()
+        else:
+            today = datetime.now().date()
+            start_of_range = today.replace(month=today.month - 1, day=today.day)
+            end_of_range = today
+
+            diapason_1 = and_(EarningsModel.time_created >= start_of_range,
+                              EarningsModel.time_created < end_of_range + timedelta(days=1))
+
+            earnings_query = (
+                session.query(
+                    EarningsModel.id,
+                    EarningsModel.time_created.label('time_created'),
+                    EarningsModel.summa,
+                    EarningsModel.comment,
+                    EarningsModel.currency,
+                    EarningsModel.source_name,
+                    LoanAdminsModel.admin_username,
+                    literal('earnings').label('source'),
+                )
+                .join(LoanAdminsModel, LoanAdminsModel.id == EarningsModel.agent_source_id)
+                .join(SourcesOfIncomeModel, SourcesOfIncomeModel.id == EarningsModel.income_source_id)
+                .filter(diapason_1)
+            )
+            diapason_2 = and_(WithdrawModel.time_created >= start_of_range,
+                              WithdrawModel.time_created < end_of_range + timedelta(days=1))
+            withdraw_query = session.query(
+                WithdrawModel.id,
+                WithdrawModel.time_created.label('time_created'),
+                WithdrawModel.summa * -1,
+                null().label('comment'),
+                literal(CurrencyEnum.DOLLAR).label('currency'),
+                null().label('source_name'),
+                LoanAdminsModel.admin_username,
+                literal('withdraw').label('source'),
+            ).join(LoanAdminsModel, LoanAdminsModel.id == WithdrawModel.agent_source_id).filter(diapason_2)
+
+            query = earnings_query.union(withdraw_query).order_by(desc(text('time_created')))
+
+            return query.all()
 
     @staticmethod
     def update_earning_from_xlsx(time_created, summa, comment, currency, source_name, admin_username, identifier: str):

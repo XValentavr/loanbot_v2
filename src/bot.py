@@ -61,12 +61,22 @@ def my_income(message):
         loan.send_message(message.chat.id, "У вас нет доступа к этой команде!")
 
 
+@loan.message_handler(commands=["fullsheet"])
+@login_required
+def fullsheet_sending(message):
+    agent = agent_cruds.get_by_username(username=message.from_user.username)
+    if agent.admin_username in HelperMainAgentEnum.MAIN_ADMIN_USERNAME:
+        send_xlsx_file(loan, message)
+    else:
+        loan.send_message(message.chat.id, "У вас нет доступа к этой команде!")
+
+
 @loan.message_handler(commands=["sheet"])
 @login_required
 def sheet_sending(message):
     agent = agent_cruds.get_by_username(username=message.from_user.username)
     if agent.admin_username in HelperMainAgentEnum.MAIN_ADMIN_USERNAME:
-        send_xlsx_file(loan, message)
+        send_xlsx_file(loan, message, partial=True)
     else:
         loan.send_message(message.chat.id, "У вас нет доступа к этой команде!")
 
