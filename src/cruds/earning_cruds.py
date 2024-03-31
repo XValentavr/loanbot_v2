@@ -106,7 +106,11 @@ class EarningsCruds:
             return query.all()
         else:
             today = datetime.now().date()
-            start_of_range = today.replace(month=today.month - 1, day=today.day)
+            days = None
+            if int(today.month - 1) == 2:
+                days = 29
+
+            start_of_range = today.replace(month=today.month - 1, day=days or today.day)
             end_of_range = today
 
             diapason_1 = and_(EarningsModel.time_created >= start_of_range,

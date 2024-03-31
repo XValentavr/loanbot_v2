@@ -72,7 +72,7 @@ def _create_rows(sheet, table):
         for c, value in enumerate(row, start=1):
             if table.columns[c - 1] == 'Summa':  # Check if the column is 'Summa'
                 if isinstance(value, str) and value not in earnings_columns:
-                    value = float(value)
+                    value = str(float(value)).replace('.', ',')
             elif table.columns[c - 1] == 'Time Created':
                 if isinstance(value, Timestamp) and value not in earnings_columns:
                     value = pd.Timestamp(value).date()
@@ -99,7 +99,7 @@ def _conditional_formatting(sheet, model):
             withdraw_cell.value = withdraw_value.upper()
             withdraw_cell.font = Font(color="FF0000")
 
-        summa_cell.font = Font(color="C0504E" if summa_value < 0 else "4F6328")
+        summa_cell.font = Font(color="C0504E" if float(summa_value.replace(',', '.')) < 0 else "4F6328")
 
 
 def _wrap_text(sheet, columns):
