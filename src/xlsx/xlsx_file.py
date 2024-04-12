@@ -99,7 +99,14 @@ def _conditional_formatting(sheet, model):
             withdraw_cell.value = withdraw_value.upper()
             withdraw_cell.font = Font(color="FF0000")
 
-        summa_cell.font = Font(color="C0504E" if float(summa_value.replace(',', '.')) < 0 else "4F6328")
+        if isinstance(summa_value, str):
+            summa_value_float = float(summa_value.replace(',', '.'))
+        else:
+            summa_value_float = summa_value
+
+        summa_cell.value = summa_value_float
+
+        summa_cell.font = Font(color="C0504E" if summa_value_float < 0 else "4F6328")
 
 
 def _wrap_text(sheet, columns):
