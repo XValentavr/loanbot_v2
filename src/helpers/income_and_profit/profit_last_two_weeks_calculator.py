@@ -1,6 +1,6 @@
 import calendar
 import re
-from datetime import datetime
+from datetime import datetime, timedelta, date
 from typing import List
 
 from cruds.source_of_income_cruds import source_of_income_cruds
@@ -139,8 +139,6 @@ def get_withdrawal_summa(withdrawal):
 
 
 def create_proportional_parts_of_month(month=None):
-    from datetime import date, timedelta
-
     if not month:
         today = date.today()
         current_month = today.month
@@ -148,19 +146,22 @@ def create_proportional_parts_of_month(month=None):
     else:
         current_month = list(calendar.month_name).index(month.get('month').capitalize()) + 1
         current_year = month.get('year')
-    if current_month == 12:
-        next_month = 1
-        next_year = current_year + 1
+
+    if current_month == 1:
+        prev_month = 12
+        prev_year = current_year - 1
     else:
-        next_month = current_month + 1
-        next_year = current_year
+        prev_month = current_month - 1
+        prev_year = current_year
 
-    days_in_month = date(next_year, next_month, 1) - date(current_year, current_month, 1)
-    interval_start_first = date(current_year, current_month, 1)
-    interval_end_first = date(current_year, current_month, int(days_in_month.days / 2))
+    days_in_prev_month = calendar.monthrange(prev_year, prev_month)[1]
+    prev_month_end = date(prev_year, prev_month, days_in_prev_month)
 
-    interval_start_second = interval_end_first + timedelta(days=1)
-    interval_end_second = date(current_year, current_month, days_in_month.days)
+    interval_start_first = date(prev_year, prev_month, 16)
+    interval_end_first = prev_month_end
+
+    interval_start_second = date(current_year, current_month, 1)
+    interval_end_second = date(current_year, current_month, 15)
 
     return [interval_start_first, interval_end_first], [interval_start_second, interval_end_second]
 
