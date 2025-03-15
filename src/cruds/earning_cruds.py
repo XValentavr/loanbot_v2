@@ -106,9 +106,12 @@ class EarningsCruds:
             return query.all()
         else:
             today = datetime.now().date()
-            days, year = None, None
+            days, year = None, today.year
             if int(today.month - 1) == 2:
-                days = 29
+                if (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0):
+                    days = 29
+                else:
+                    days = 28
             if today.month == 1:
                 month, days = 13, 31
                 year= today.year - 1
